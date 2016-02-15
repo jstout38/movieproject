@@ -1,0 +1,46 @@
+{% extends "main.html" %}
+{% block content %}
+	<h1>Movie List for {{user.name}}!</h1>
+
+	{% with messages = get_flashed_messages() %}
+    {% if messages %}
+
+        <ul>
+        {% for message in messages %}
+          <li><strong>{{ message }} </strong> </li>
+        {% endfor %}
+      </ul>
+    {% endif %}
+    {% endwith %}
+    
+	<div class="row">
+	<div class="col-md-1"></div>
+	<div class="col-md-10">
+	<div class="table-responsive">
+	<table class="table table-bordered table-hover">
+	<thead>
+	<tr>
+	<th>Title</th>
+	<th>Description</th>
+	<th>Review</th>
+	</tr>
+	</thead>
+	<tbody>
+	{% for movie in movies %}
+	<tr>
+	<th>{{movie.name}} <a href="{{ url_for('editMovie', user_id = user.id, movie_id = movie.id) }}">(Edit)</a> <a href="{{ url_for('deleteMovie', user_id = user.id, movie_id = movie.id) }}">(Delete)</a></th>
+	<th>{{movie.description}}</th>
+	<th>{{movie.review}}</th>
+
+	{% endfor %}
+	</tbody>
+	</table>
+	</div>
+	</div>
+	</div>
+
+	<h3><a href="{{ url_for('addMovie', user_id = user.id) }}">Add New Movie</a></h3>
+
+	<h3><a href="{{ url_for('users') }}">Back to User List</a></h3>
+
+{% endblock %}

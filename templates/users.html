@@ -1,0 +1,48 @@
+{% extends "main.html" %}
+{% block content %}
+
+	<div class="row">
+	<div class="col-md-1"></div>
+	<div class="col-md-11">
+	<h1>Welcome to the Movie Log!</h1>
+	<h3>Check out what our members have been watching by clicking on their user profile below!</h3>
+	</div>
+	</div>
+	
+	 {% with messages = get_flashed_messages() %}
+    {% if messages %}
+
+        <ul>
+        {% for message in messages %}
+          <li><strong>{{ message }} </strong> </li>
+        {% endfor %}
+      </ul>
+    {% endif %}
+    {% endwith %}
+    
+    <div class="row">
+    <div class="col-md-1"></div>
+    <div class="col-md-10">
+	<div class="table-responsive">
+	<table class="table table-bordered table-hover">
+	<tbody>
+	{% for user in users %}
+	<tr>
+	<th><a href="{{ url_for('showMovies', user_id = user.id) }}">{{user.name}}</a></th>
+	<th><a href="{{ url_for('editUser', user_id = user.id) }}">(edit)</a></th>
+	<th><a href="{{ url_for('deleteUser', user_id = user.id) }}">(delete)</a></br></th>
+	{% endfor %}
+	</tbody>
+	</table>
+	</div>
+	</div>
+	</div>
+
+	<div class="row">
+	<div class="col-md-1"></div>
+	<div class="col-md-11">
+	<h3><a href="/users/new/">Create New User</a></h3>
+	</div>
+	</div>
+
+{% endblock %}
