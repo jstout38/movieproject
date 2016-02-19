@@ -3,7 +3,7 @@
 
 <h1>New Movie for {{user.name}}!</h1>
 
-<form action="{{ url_for('addMovie', user_id = user.id) }}" method = post>
+<!--<form action="{{ url_for('addMovie', user_id = user.id) }}" method = post>
 
 	<p>Name:</p>
 	  <input type = 'text' size = '30' name = 'name'>
@@ -13,7 +13,46 @@
 	  <input type = 'text' size = '250' name = 'review'>
 
 	<p> <input type = 'submit' value = 'Create'></p>
-</form>
+</form>-->
+<div class = "row">
+<div class = "col-xs-4">
+<input id="new-movie" class="form-control" placeholder="What movie did you watch?" autofocus>
+</div>
+</div>
+		<div class = "row">
+			<!-- div to contain the results of the search, will not be displayed until necessary -->
+			<div class = "col-xs-4">
+			<ul id="searchresults" class="list-group"></ul>
+			</div>
+		</div>
+		<div class = "row">
+		<div class = "col-xs-4" id = "movie-container"></div>
+		</div>
+		<div class = "row">
+		<div class = "col-xs-4">
+		<label for="date-watched">Date watched:</label>
+		<input type="date" class="form-control" id="date-watched">
+		</div>
+		</div>
+		<div class = "row">
+		<div class = "col-xs-4">
+		<label for="rating">Your rating (1 to 5 stars):</label>
+		<select class="form-control" id="rating">
+			<option>5 stars</option>
+			<option>4 stars</option>
+			<option>3 stars</option>
+			<option>2 stars</option>
+			<option>1 stars</option>
+		</select>
+		</div>
+		</div>
+		<div class = "row">
+		<div class = "col-xs-4">
+		<textarea class="form-control" id = "review" placeholder="Your review! What did you think?"></textarea>
+		</div>
+		</div>
+		<button type="submit" id = "addMovie" class="btn btn-default">Add your movie!</button>
+		<a href="{{ url_for('showMovies', user_id = user.id) }}" class="btn btn-default" role="button">Cancel</a>
 
-	<p> <a href = "{{ url_for('showMovies', user_id = user.id) }}">Cancel</a></p>
+	
 {% endblock %}
