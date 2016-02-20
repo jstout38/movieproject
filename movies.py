@@ -21,6 +21,12 @@ def users():
 	return render_template('users.html', users = userlist)
 	#return "Here is a list of users"
 
+@app.route('/login')
+def showLogin():
+	state = ''.join(random.choice(string.ascii_uppercase + string.digits) for x in xrange(32))
+	login_session['state'] = state
+	return render_template('login.html')
+
 @app.route('/users/new/', methods=['GET', 'POST'])
 def newUser():
 	if request.method == 'POST':
