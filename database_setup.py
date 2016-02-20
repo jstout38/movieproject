@@ -29,7 +29,7 @@ class Movie(Base):
 
 	name = Column(String(80), nullable = False)
 	id = Column(Integer, primary_key = True)
-	datewatched = Column(Date)
+	datewatched = Column(String(250))
 	description = Column(String(250))
 	review = Column(String(250))
 	rating = Column(Integer)

@@ -5,12 +5,14 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from database_setup import Base, User, Movie
 
+from flask import session as login_session
+import random, string
+
 engine = create_engine('sqlite:///movieratings.db')
 Base.metadata.bind = engine
 
 DBSession = sessionmaker(bind=engine)
 session = DBSession()
-
 
 @app.route('/')
 @app.route('/users/')
@@ -70,11 +72,11 @@ def showMovies(user_id):
 def addMovie(user_id):
 	currentUser = session.query(User).filter_by(id=user_id).one()
 	if request.method == 'POST':
-		newMovie = Movie(name = request.form['name'], description = request.form['description'], review = request.form['review'], user_id = user_id)
+		newMovie = Movie(name = request.form['title'], datewatched = request.form['dateWatched'], review = request.form['review'], mdbid = request.form['mdbid'], rating = request.form['rating'], user_id = user_id)
 		session.add(newMovie)
 		session.commit()
 		flash("movie added")
-		return redirect(url_for('showMovies', user_id = user_id))
+		return jsonify({'status':'OK', 'redirect_url':url_for('showMovies', user_id = user_id)})
 	else:
 		return render_template('addMovie.html', user = currentUser)
 	#return "Add a movie for user number %i" % user_id

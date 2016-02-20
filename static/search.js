@@ -62,6 +62,21 @@ var updateMovie = function(title, id) {
  	newMovie.rating = $('#rating').val();
  	newMovie.review = $('#review').val().trim();
  	console.log(newMovie);
+ 	var currentURL = $(location).attr('href');
+	var userID = currentURL.substring(currentURL.length - 6, currentURL.length - 5);
+	console.log(userID);
+	$.ajax({
+		url: '/user/' + userID + '/add/',
+		data: newMovie,
+		type: 'POST',
+		dataType: 'json',
+		success: function(response) {
+			window.location.href = response.redirect_url;
+		},
+		error: function(error) {
+			console.log(error);
+		}
+	});	
  }
 
   $('#new-movie').on('keypress', function(e){

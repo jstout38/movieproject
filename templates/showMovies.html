@@ -17,7 +17,7 @@
 	<div class="col-md-1"></div>
 	<div class="col-md-10">
 	<div class="table-responsive">
-	<table class="table table-bordered table-hover">
+	<table class="table table-bordered">
 	<thead>
 	<tr>
 	<th>Title</th>
@@ -28,8 +28,29 @@
 	<tbody>
 	{% for movie in movies %}
 	<tr>
-	<th>{{movie.name}} <a href="{{ url_for('editMovie', user_id = user.id, movie_id = movie.id) }}">(Edit)</a> <a href="{{ url_for('deleteMovie', user_id = user.id, movie_id = movie.id) }}">(Delete)</a></th>
-	<th>{{movie.description}}</th>
+	<th id="{{movie.mdbid}}"></th>
+		<script type="text/javascript">
+			var key = '924332c90e5f89d0bc88e02232ff0723';
+			var id = {{movie.mdbid}};
+			var url = 'https://api.themoviedb.org/3/movie/' + id + '?api_key=' + key;
+
+			$.ajax({
+				'url': url,
+				'dataType': 'jsonp',
+				'type': 'GET',
+				'contentType': 'application/json',
+				'async': false,
+				'success': function(data, textStats, XMLHttpRequest) {
+					console.log(data);
+					$('#{{movie.mdbid}}').append('<img width=100 src="https://image.tmdb.org/t/p/w396/' + data.poster_path + '"><a href="{{ url_for('editMovie', user_id = user.id, movie_id = movie.id) }}">(Edit)</a> <a href="{{ url_for('deleteMovie', user_id = user.id, movie_id = movie.id) }}">(Delete)</a>');
+					$('#desc{{movie.mdbid}}').append(data.overview);
+				},
+				'error': function() {
+					alert('There was a problem.');
+				}
+			});
+		</script>
+	<th id="desc{{movie.mdbid}}"></th>
 	<th>{{movie.review}}</th>
 
 	{% endfor %}
