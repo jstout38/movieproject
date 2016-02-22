@@ -79,6 +79,10 @@ var updateMovie = function(title, id) {
 	});	
  }
 
+function renderMovies() {
+
+}
+
   $('#new-movie').on('keypress', function(e){
            if (e.which == 13) {
                 searchResults();
