@@ -53,7 +53,7 @@ def gconnect():
 		response.headers['Content-Type'] = 'application/json'
 		return response
 	access_token = credentials.access_token
-	url = ('https//www.googleapis.com/oauth2/v1/tokeninfo?access_token=%s' % access_token)
+	url = ('https://www.googleapis.com/oauth2/v1/tokeninfo?access_token=%s' % access_token)
 	h = httplib2.Http()
 	result = json.loads(h.request(url, 'GET')[1])
 	if result.get('error') is not None:
@@ -85,7 +85,7 @@ def gconnect():
 	params = {'access_token': credentials.access_token, 'alt': 'json'}
 	answer = requests.get(userinfo_url, params = params)
 	data = answer.json()
-
+	print login_session
 	login_session['username'] = data["name"]
 	login_session['picture'] = data["picture"]
 	login_session['email'] = data["email"]
@@ -101,8 +101,43 @@ def gconnect():
 	flash("you are now logged in as %s" %login_session['username'])
 	return output
 
+@app.route("/gdisconnect")
+def gdisconnect():
+	credentials = login_session.get('credentials')
+	access_token = credentials.access_token
+	print 'In gdisconnect access token is %s', access_token
+	print 'User name is: '
+	print login_session.get('username')
+	if credentials is None:
+		print 'Access Token is None'
+		response = make_response(json.dumps('Current user not connected.'), 401)
+		response.headers['Content-Type'] = 'application/json'
+		return response
+	url = 'https://accounts.google.com/o/oauth2/revoke?token=%s' % access_token
+	h = httplib2.Http()
+	result = h.request(url, 'GET')[0]
+	print result
+	print url
+	if result['status'] == '200':
+		del login_session['credentials']
+		del login_session['gplus_id']
+		del login_session['username']
+		del login_session['email']
+		del login_session['picture']
+
+		response = make_response(json.dumps('Successfully disconnected.'), 200)
+		response.headers['Content-Type'] = 'application/json'
+		return response
+	else:
+		response = make_response(
+			json.dumps('Failed to revoke token for given user.', 400))
+		response.headers['Content-Type'] = 'application/json'
+		return response
+
 @app.route('/users/new/', methods=['GET', 'POST'])
 def newUser():
+	if 'username' not in login_session:
+		return redirect('/login')
 	if request.method == 'POST':
 		newUser = User(name = request.form['name'], email = request.form['email'])
 		session.add(newUser)
@@ -115,6 +150,8 @@ def newUser():
 
 @app.route('/user/<int:user_id>/edit/', methods=['GET', 'POST'])
 def editUser(user_id):
+	if 'username' not in login_session:
+		return redirect('/login')
 	editedUser = session.query(User).filter_by(id=user_id).one()
 	if request.method == 'POST':
 		if request.form['name']:
@@ -131,6 +168,8 @@ def editUser(user_id):
 
 @app.route('/user/<int:user_id>/delete/', methods=['GET', 'POST'])
 def deleteUser(user_id):
+	if 'username' not in login_session:
+		return redirect('/login')
 	deletedUser = session.query(User).filter_by(id=user_id).one()
 	if request.method == 'POST':
 		session.delete(deletedUser)
@@ -150,6 +189,8 @@ def showMovies(user_id):
 
 @app.route('/user/<int:user_id>/add/', methods=['GET', 'POST'])
 def addMovie(user_id):
+	if 'username' not in login_session:
+		return redirect('/login')
 	currentUser = session.query(User).filter_by(id=user_id).one()
 	if request.method == 'POST':
 		newMovie = Movie(name = request.form['title'], datewatched = request.form['dateWatched'], review = request.form['review'], mdbid = request.form['mdbid'], rating = request.form['rating'], user_id = user_id)
@@ -163,6 +204,8 @@ def addMovie(user_id):
 
 @app.route('/user/<int:user_id>/<int:movie_id>/edit/', methods=['GET', 'POST'])
 def editMovie(user_id, movie_id):
+	if 'username' not in login_session:
+		return redirect('/login')
 	currentUser = session.query(User).filter_by(id=user_id).one()
 	currentMovie = session.query(Movie).filter_by(id=movie_id).one()
 	if request.method == 'POST':
@@ -182,6 +225,8 @@ def editMovie(user_id, movie_id):
 
 @app.route('/user/<int:user_id>/<int:movie_id>/delete/', methods=['GET', 'POST'])
 def deleteMovie(user_id, movie_id):
+	if 'username' not in login_session:
+		return redirect('/login')
 	currentUser = session.query(User).filter_by(id=user_id).one()
 	currentMovie = session.query(Movie).filter_by(id=movie_id).one()
 	if request.method == 'POST':
