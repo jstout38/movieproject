@@ -1,0 +1,65 @@
+{% extends "main.html" %}
+{% block content %}
+	<h1>Movie List for {{user.name}}!</h1>
+
+	{% with messages = get_flashed_messages() %}
+    {% if messages %}
+
+        <ul>
+        {% for message in messages %}
+          <li><strong>{{ message }} </strong> </li>
+        {% endfor %}
+      </ul>
+    {% endif %}
+    {% endwith %}
+    
+	<div class="row">
+	<div class="col-md-1"></div>
+	<div class="col-md-10">
+	<div class="table-responsive">
+	<table class="table table-bordered">
+	<thead>
+	<tr>
+	<th>Title</th>
+	<th>Description</th>
+	<th>Review</th>
+	</tr>
+	</thead>
+	<tbody>
+	{% for movie in movies %}
+	<tr>
+	<th id="{{movie.mdbid}}"></th>
+		<script type="text/javascript">
+			var key = '924332c90e5f89d0bc88e02232ff0723';
+			var id = {{movie.mdbid}};
+			var url = 'https://api.themoviedb.org/3/movie/' + id + '?api_key=' + key;
+
+			$.ajax({
+				'url': url,
+				'dataType': 'jsonp',
+				'type': 'GET',
+				'contentType': 'application/json',
+				'async': false,
+				'success': function(data, textStats, XMLHttpRequest) {
+					console.log(data);
+					$('#{{movie.mdbid}}').append('<img width=100 src="https://image.tmdb.org/t/p/w396/' + data.poster_path + '">');
+					$('#desc{{movie.mdbid}}').append(data.overview);
+				},
+				'error': function() {
+					alert('There was a problem.');
+				}
+			});
+		</script>
+	<th id="desc{{movie.mdbid}}"></th>
+	<th>{{movie.review}}</th>
+
+	{% endfor %}
+	</tbody>
+	</table>
+	</div>
+	</div>
+	</div>
+
+	<h3><a href="{{ url_for('users') }}">Back to User List</a></h3>
+
+{% endblock %}

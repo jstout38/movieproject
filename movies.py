@@ -18,7 +18,7 @@ import requests
 CLIENT_ID = json.loads(open('client_secrets.json', 'r').read())['web']['client_id']
 APPLICATION_NAME = "The Movie List"
 
-engine = create_engine('sqlite:///movieratings.db')
+engine = create_engine('sqlite:///movies.db')
 Base.metadata.bind = engine
 
 DBSession = sessionmaker(bind=engine)
@@ -89,6 +89,20 @@ def gconnect():
 	login_session['username'] = data["name"]
 	login_session['picture'] = data["picture"]
 	login_session['email'] = data["email"]
+	login_session['provider'] = 'google'
+
+	user_id = getUserID(data["email"])
+	if not user_id:
+		output = ''
+		user_id = CreateUser(login_session)
+		output += '<h1>Welcome to the Movie Log, '
+		output += login_session['username']
+		output += '!</h1>'
+		flash("you have been registered")
+		login_session['user_id'] = user_id
+		return output
+	login_session['user_id'] = user_id
+	
 
 	output = ''
 	output +='<h1>Welcome, '
@@ -99,6 +113,57 @@ def gconnect():
 	output += login_session['picture']
 	output +=' " style = "width: 300px; height: 300px;border-radius: 150px;-webkit-border-radius: 150px;-moz-border-radius: 150px;"> '
 	flash("you are now logged in as %s" %login_session['username'])
+	return output
+
+@app.route('/fbconnect', methods=['POST'])
+def fbconnect():
+	if request.args.get('state') != login_session['state']:
+		reponse = make_response(json.dumps('Invalid state parameter.'), 401)
+		response.headers['Content-Type'] = 'application/json'
+		return response
+	access_token = request.data
+	app_id = json.loads(open('fb_client_secrets.json', 'r').read())['web']['app_id']
+	app_secret = json.loads(open('fb_client_secrets.json', 'r').read())['web']['app_secret']
+	url = 'https://graph.facebook.com/oauth/access_token?grant_type=fb_exchange_token&client_id=%s&client_secret=%s&fb_exchange_token=%s' % (app_id,app_secret,access_token)
+	h = httplib2.Http()
+	result = h.request(url, 'GET')[1]
+
+	userinfo_url = "https://graph.facebook.com/v2.5/me"
+	token = result.split("&")[0]
+
+	url = 'https://graph.facebook.com/v2.5/me?%s&fields=name,id,email' % token
+	h = httplib2.Http()
+	result = h.request(url, 'GET')[1]
+	data = json.loads(result)
+
+	login_session['username'] = data["name"]
+	login_session['email'] = data["email"]
+	login_session['facebook_id'] = data["id"]
+	login_session['provider'] = 'facebook'
+
+	stored_token = token.split("=")[1]
+	login_session['access_token'] = stored_token
+
+	url = 'https://graph.facebook.com/v2.5/me/picture?%s&redirect=0&height=200&width=200' % token
+	h = httplib2.Http()
+	result = h.request(url, 'GET')[1]
+	data = json.loads(result)
+
+	login_session['picture'] = data["data"]["url"]
+
+	user_id = getUserID(login_session['email'])
+	if not user_id:
+		user_id = createUser(login_session)
+	login_session['user_id'] = user_id
+
+	output = ''
+	output +='<h1>Welcome, '
+	output += login_session['username']
+
+	output +='!</h1>'
+	output +='!<img src="'
+	output += login_session['picture']
+	output +=' " style = "width: 300px; height: 300px;border-radius: 150px;-webkit-border-radius: 150px;-moz-border-radius: 150px;"> '
 	return output
 
 @app.route("/gdisconnect")
@@ -118,21 +183,40 @@ def gdisconnect():
 	result = h.request(url, 'GET')[0]
 	print result
 	print url
-	if result['status'] == '200':
-		del login_session['credentials']
-		del login_session['gplus_id']
+	if result['status'] != '200':
+		response = make_response(json.dumps('Failed to revoke token for given user.'), 400)
+		response.headers['Content-Type'] = 'application/json'
+		return response
+	
+@app.route("/fbdisconnect")
+def fbdisconnect():
+	facebook_id = login_session['facebook_id']
+	access_token = login_session['access_token']
+	url = 'https://graph.facebook.com/%s/permissions?access_token=%s' % (facebook_id, access_token)
+	h = httplib2.Http()
+	result = h.request(url, 'DELETE')[1]
+	return "you have been logged out"
+
+@app.route('/disconnect')
+def disconnect():
+	if 'provider' in login_session:
+		if login_session['provider'] == 'google':
+			gdisconnect()
+			del login_session['gplus_id']
+			del login_session['credentials']			
+		if login_session['provider'] == 'facebook':
+			fbdisconnect()
+			del login_session['facebook_id']
 		del login_session['username']
 		del login_session['email']
 		del login_session['picture']
-
-		response = make_response(json.dumps('Successfully disconnected.'), 200)
-		response.headers['Content-Type'] = 'application/json'
-		return response
+		del login_session['user_id']
+		del login_session['provider']
+		flash("You have successfully been logged out.")
+		return redirect(url_for('users'))
 	else:
-		response = make_response(
-			json.dumps('Failed to revoke token for given user.', 400))
-		response.headers['Content-Type'] = 'application/json'
-		return response
+		flash("You were not logged in to begin with!")
+		return redirect(url_for('users'))
 
 @app.route('/users/new/', methods=['GET', 'POST'])
 def newUser():
@@ -184,14 +268,17 @@ def deleteUser(user_id):
 def showMovies(user_id):
 	currentUser = session.query(User).filter_by(id=user_id).one()
 	movielist = session.query(Movie).filter_by(user_id = user_id).all()
-	return render_template('showMovies.html', user = currentUser, movies = movielist)
+	if 'username' in login_session:
+		if login_session['email'] == currentUser.email:
+			return render_template('showMovies.html', user = currentUser, movies = movielist)
+	return render_template('showMoviesNE.html', user = currentUser, movies = movielist)
 	#return "Show movies for user number %i" % user_id
 
 @app.route('/user/<int:user_id>/add/', methods=['GET', 'POST'])
 def addMovie(user_id):
-	if 'username' not in login_session:
-		return redirect('/login')
 	currentUser = session.query(User).filter_by(id=user_id).one()
+	if login_session['email'] != currentUser.email:
+		return redirect('/')
 	if request.method == 'POST':
 		newMovie = Movie(name = request.form['title'], datewatched = request.form['dateWatched'], review = request.form['review'], mdbid = request.form['mdbid'], rating = request.form['rating'], user_id = user_id)
 		session.add(newMovie)
@@ -204,9 +291,9 @@ def addMovie(user_id):
 
 @app.route('/user/<int:user_id>/<int:movie_id>/edit/', methods=['GET', 'POST'])
 def editMovie(user_id, movie_id):
-	if 'username' not in login_session:
-		return redirect('/login')
 	currentUser = session.query(User).filter_by(id=user_id).one()
+	if login_session['email'] != currentUser.email:
+		return redirect('/')
 	currentMovie = session.query(Movie).filter_by(id=movie_id).one()
 	if request.method == 'POST':
 		if request.form['name']:
@@ -225,9 +312,9 @@ def editMovie(user_id, movie_id):
 
 @app.route('/user/<int:user_id>/<int:movie_id>/delete/', methods=['GET', 'POST'])
 def deleteMovie(user_id, movie_id):
-	if 'username' not in login_session:
-		return redirect('/login')
 	currentUser = session.query(User).filter_by(id=user_id).one()
+	if login_session['email'] != currentUser.email:
+		return redirect('/')
 	currentMovie = session.query(Movie).filter_by(id=movie_id).one()
 	if request.method == 'POST':
 		session.delete(currentMovie)
@@ -252,6 +339,24 @@ def userMoviesJSON(user_id):
 def movieDetailsJSON(user_id, movie_id):
 	movie = session.query(Movie).filter_by(id = movie_id).one()
 	return jsonify(Details=[movie.serialize])
+
+def getUserID(email):
+	try:
+		user = session.query(User).filter_by(email = email).one()
+		return user.id
+	except:
+		return None
+
+def getUserInfo(user_id):
+	user = session.query(User).filter_by(id = user_id).one()
+	return user
+
+def CreateUser(login_session):
+	newUser = User(name = login_session['username'], email = login_session['email'], picture = login_session['picture'])
+	session.add(newUser)
+	session.commit()
+	user = session.query(User).filter_by(email = login_session['email']).one()
+	return user.id
 
 if __name__ == '__main__':
 	app.secret_key = 'super_secret_key'

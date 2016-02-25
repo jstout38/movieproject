@@ -14,6 +14,7 @@ class User(Base):
 	name = Column(String(80), nullable = False)
 	id = Column(Integer, primary_key = True)
 	email = Column(String(80))
+	picture = Column(String(250))
 
 	@property
 	def serialize(self):
@@ -49,5 +50,5 @@ class Movie(Base):
 
 
 
-engine = create_engine('sqlite:///movieratings.db')
+engine = create_engine('sqlite:///movies.db')
 Base.metadata.create_all(engine)

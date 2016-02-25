@@ -48,6 +48,49 @@
 		}
 	}
 	</script>
+
+	<div id="fb-root"></div>
+<script>
+
+(function(d, s, id) {
+  var js, fjs = d.getElementsByTagName(s)[0];
+  if (d.getElementById(id)) return;
+  js = d.createElement(s); js.id = id;
+  js.src = "//connect.facebook.net/en_US/sdk.js#xfbml=1&version=v2.5&appId=244941795842820";
+  fjs.parentNode.insertBefore(js, fjs);
+}(document, 'script', 'facebook-jssdk'));
+
+
+		function sendTokenToServer() {
+			var access_token = FB.getAccessToken();
+			console.log(access_token)
+			console.log('Welcome! Fetching your information.... ');
+			FB.api('/me', function(response) {
+				console.log('Successful login for: ' + response.name);
+				$.ajax({
+					type: 'POST',
+					url: '/fbconnect?state={{STATE}}',
+					processData: false,
+					data: access_token,
+					contentType: 'application/octet-stream; charset=utf-8',
+					success: function(result) {
+						if (result) {
+							$('#result').html('Login Successful!</br>' + result + '</br>Redirecting...')
+							setTimeout(function() {
+								window.location.href = "/";
+							}, 4000);
+						} else {
+							$('#result').html('Failed to make a server-side call. Check your configuration and console.')
+						}
+					}
+				});
+			});
+		}
+</script>
+
+<div class="fb-login-button" data-max-rows="1" data-size="medium" data-show-faces="false" data-auto-logout-link="false" scope="public_profile,email" onlogin="sendTokenToServer();"></div>
+
+
 </body>
 
 
