@@ -1,5 +1,9 @@
 {% extends "main.html" %}
-{% include "header.html" %}
+{% if login() == None %}
+	{% include "header.html" %}
+{% else %}
+	{% include "header2.html" %}
+{% endif %}
 {% block content %}
 	<div class = "row">
 	<h1>Movie List for {{user.name}}!</h1>

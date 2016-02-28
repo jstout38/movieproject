@@ -1,5 +1,9 @@
 {% extends "main.html" %}
-{% include "header.html" %}
+{% if login() == None %}
+	{% include "header.html" %}
+{% else %}
+	{% include "header2.html" %}
+{% endif %}
 {% block content %}
 
 <h1>Are you sure you want to delete {{movie.name}}?</h1>

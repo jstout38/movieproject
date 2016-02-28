@@ -1,7 +1,7 @@
 	<div class="container-fluid">
 	<div class="row top-menu">
 	<div class="col-md-6">
-		<h3>The Movie List!</h3>
+		<a href="{{ url_for('users') }}"><img src = "{{ url_for('static', filename='images/logo.jpg') }}" alt="The Movie Log!"></a>
 	</div>
 	<div class="col-md-6 text-right">
 					
@@ -18,7 +18,7 @@
 			data-cookiepolicy="single_host_origin"
 			data-callback="signInCallback"
 			data-approvalprompt="force"
-			data-size="large">
+			data-width="25px">
 		</span>
 	</div>
 	<div id="result"></div>
@@ -93,7 +93,7 @@
 </script>
 
 <div class="fb-login-button" data-size="large" data-show-faces="false" data-auto-logout-link="false" scope="public_profile,email" onlogin="sendTokenToServer();"></div>
-<h4 style="float: right">Log In/Create Account:</h4>
+<h4 style="float: right">Log In/Create Account: </h4>
 </div>
 
 
