@@ -1,15 +1,13 @@
-
+	<div class="container-fluid">
 	<div class="row top-menu">
 	<div class="col-md-6">
-		<a href="{{url_for('showRestaurants')}}">
-			<span class="glyphicon glyphicon-home" aria-hidden="true"></span>Show All Restaurants
-		</a>
+		<h3>The Movie List!</h3>
 	</div>
 	<div class="col-md-6 text-right">
 					
-		
-	
+			
 
+		<div class = "row">
 
 	<div id="signInButton">
 		<span class="g-signin"
@@ -19,7 +17,8 @@
 			data-accesstype="offline"
 			data-cookiepolicy="single_host_origin"
 			data-callback="signInCallback"
-			data-approvalprompt="force">
+			data-approvalprompt="force"
+			data-size="large">
 		</span>
 	</div>
 	<div id="result"></div>
@@ -29,9 +28,10 @@
 		if (authResult['code']) {
 			$('#signinButton').attr('style', 'display: none');
 
+
 			$.ajax({
 				type: 'POST',
-				url: '/gconnect?state={{STATE}}',
+				url: '/gconnect?state={{STATE()}}',
 				processData: false,
 				data: authResult['code'],
 				contentType: 'application/octet-stream; charset=utf-8',
@@ -73,7 +73,7 @@
 				console.log('Successful login for: ' + response.name);
 				$.ajax({
 					type: 'POST',
-					url: '/fbconnect?state={{STATE}}',
+					url: '/fbconnect?state={{STATE()}}',
 					processData: false,
 					data: access_token,
 					contentType: 'application/octet-stream; charset=utf-8',
@@ -92,6 +92,11 @@
 		}
 </script>
 
-<div class="fb-login-button" data-max-rows="1" data-size="medium" data-show-faces="false" data-auto-logout-link="false" scope="public_profile,email" onlogin="sendTokenToServer();"></div>
+<div class="fb-login-button" data-size="large" data-show-faces="false" data-auto-logout-link="false" scope="public_profile,email" onlogin="sendTokenToServer();"></div>
+<h4 style="float: right">Log In/Create Account:</h4>
+</div>
 
+
+</div>
+</div>
 </div>

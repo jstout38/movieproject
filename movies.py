@@ -18,24 +18,40 @@ import requests
 CLIENT_ID = json.loads(open('client_secrets.json', 'r').read())['web']['client_id']
 APPLICATION_NAME = "The Movie List"
 
+state = ''
+
 engine = create_engine('sqlite:///movies.db')
 Base.metadata.bind = engine
 
 DBSession = sessionmaker(bind=engine)
 session = DBSession()
 
+
+
+
+@app.context_processor
+def inject_state():
+	def current_state(): 
+		return login_session['state']
+	return dict(STATE=current_state)
+
+@app.context_processor
+def inject_login():
+	def current_login():
+		try:
+			return login_session['username']
+		except:
+			return None
+	return dict(login=current_login)
+
 @app.route('/')
 @app.route('/users/')
 def users():
+	state = ''.join(random.choice(string.ascii_uppercase + string.digits) for x in xrange(32))
+	login_session['state'] = state
 	userlist = session.query(User).all()
 	return render_template('users.html', users = userlist)
 	#return "Here is a list of users"
-
-@app.route('/login')
-def showLogin():
-	state = ''.join(random.choice(string.ascii_uppercase + string.digits) for x in xrange(32))
-	login_session['state'] = state
-	return render_template('login.html', STATE=state)
 
 @app.route('/gconnect', methods=['POST'])
 def gconnect():
@@ -346,6 +362,9 @@ def getUserID(email):
 		return user.id
 	except:
 		return None
+
+def getCurrentState():
+	return STATE
 
 def getUserInfo(user_id):
 	user = session.query(User).filter_by(id = user_id).one()

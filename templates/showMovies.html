@@ -1,5 +1,7 @@
 {% extends "main.html" %}
+{% include "header.html" %}
 {% block content %}
+	<div class = "row">
 	<h1>Movie List for {{user.name}}!</h1>
 
 	{% with messages = get_flashed_messages() %}
@@ -12,6 +14,7 @@
       </ul>
     {% endif %}
     {% endwith %}
+</div>
     
 	<div class="row">
 	<div class="col-md-1"></div>

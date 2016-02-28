@@ -4,6 +4,9 @@ p {color: white;}
 .control-label {color: white;}
 th {color: white;}
 
+#signinbutton, .fb-login-button {float: right; margin: 10px;}
+
+
 /*body            { font-family: sans-serif; background-color: #333333; }
  h1, h2, h3, h4       { color: #CCCCCC; }
 h1, h2          { font-family: 'Georgia', serif; margin: 0; }
