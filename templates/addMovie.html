@@ -6,7 +6,7 @@
 {% endif %}
 {% block content %}
 
-<h1>New Movie for {{user.name}}!</h1>
+<h2>What have you been watching?</h2>
 
 <!--<form action="{{ url_for('addMovie', user_id = user.id) }}" method = post>
 
@@ -26,37 +26,31 @@
 </div>
 		<div class = "row">
 			<!-- div to contain the results of the search, will not be displayed until necessary -->
-			<div class = "col-xs-4">
+			<div class="col-xs-4">
 			<ul id="searchresults" class="list-group"></ul>
 			</div>
 		</div>
 		<div class = "row">
-		<div class = "col-xs-4" id = "movie-container"></div>
+		<div class = "col-xs-4" id="movie-container"></div>
 		</div>
-		<div class = "row">
+		<div class = "row" id="datecontainer">
 		<div class = "col-xs-4">
 		<label for="date-watched">Date watched:</label>
-		<input type="date" class="form-control" id="date-watched">
+		<input type="date" class="form-control" id="date-watched" default="today">
 		</div>
 		</div>
-		<div class = "row">
+		<div class = "row" id="ratingcontainer">
 		<div class = "col-xs-4">
 		<label for="rating">Your rating (1 to 5 stars):</label>
-		<select class="form-control" id="rating">
-			<option>5 stars</option>
-			<option>4 stars</option>
-			<option>3 stars</option>
-			<option>2 stars</option>
-			<option>1 stars</option>
-		</select>
+		<input id="rating-system" type="number" class="rating" min="0" max="5" step="1">
 		</div>
 		</div>
-		<div class = "row">
-		<div class = "col-xs-4">
-		<textarea class="form-control" id = "review" placeholder="Your review! What did you think?"></textarea>
+		<div class = "row" id="reviewcontainer">
+		<div class = "col-xs-4" id="reviewbox">
+		<textarea class="form-control" id="review" rows="8" placeholder="Your review! What did you think?"></textarea>
 		</div>
 		</div>
-		<button type="submit" id = "addMovie" class="btn btn-default">Add your movie!</button>
+		<button type="submit" id = "addMovie" class="btn btn-default disabled">Add your movie!</button>
 		<a href="{{ url_for('showMovies', user_id = user.id) }}" class="btn btn-default" role="button">Cancel</a>
 
 	

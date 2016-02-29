@@ -1,11 +1,11 @@
 <div class="container-fluid">
 	<div class="row top-menu">
 		<div class="col-md-6">
-			<img src = "{{ url_for('static', filename='images/logo.jpg') }}" alt="The Movie Log!">
+			<a href="{{ url_for('users') }}"><img id="logo" src = "{{ url_for('static', filename='images/logo.jpg') }}" alt="The Movie Log!"></a>
 		</div>
 		<div class="col-md-6 text-right">
 			<div class = "row">
-				<h4 id = "loginstatus" style="float: right">Logged in as: {{ login() }} <a href="/disconnect">(Log out)</a></h4>
+				<h4 id = "loginstatus" style="float: right">Logged in as: {{ login() }} <img id="topbarpic" src="{{ picture() }}" height="30"><a href="/disconnect">(Log out)</a></h4>
 			</div>
 		</div>
 	</div>

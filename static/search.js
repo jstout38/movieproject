@@ -6,6 +6,8 @@ var newMovie = {
 	review: ''
 }
 
+var timeoutId;
+
 var updateMovie = function(title, id) {
 	newMovie.title = title;
 	newMovie.mdbid = id;
@@ -18,18 +20,17 @@ var updateMovie = function(title, id) {
  		var key = '924332c90e5f89d0bc88e02232ff0723';
  		var query = $('#new-movie').val().trim();
  		var url = 'https://api.themoviedb.org/3/search/movie?api_key=' + key + '&query=' + query;
- 		console.log(url)
 
  		$.ajax({
  			'url': url,
  			'dataType': 'jsonp',
- 			'jsonpCallback': 'testing',
+ 			//'jsonpCallback': 'testing',
  			'type': 'GET',
  			'contentType': 'application/json',
  			'async': false,
  			'success': function(data, textStats, XMLHttpRequest) {
- 				$( "#searchresults" ).html('');
- 				$( "#searchresults" ).show();
+ 				//$( "#searchresults" ).html('');
+ 				//$( "#searchresults" ).show();
  				for (var i = 0; i < data.results.length; i++) {
  					var result = data.results[i];
  					var title = result.original_title;
@@ -41,13 +42,16 @@ var updateMovie = function(title, id) {
  							$( '#searchresults' ).html('');
  							$('#new-movie').val('');
  							$( '#movie-container' ).html('');
- 							$( '#movie-container' ).append('<h3>' + title + ' (' + year + ')</h3>');
+ 							$( '#movie-container' ).append('<h3 id="searchtitle">' + title + ' (' + year + ')</h3>');
  							$( '#movie-container' ).append('<img width=200 src="https://image.tmdb.org/t/p/w396/' + result.poster_path + '">');
  							$( '#movie-container' ).append('<p>' + result.overview + '</p>');
+ 							$( '#addMovie').attr("class", "btn btn-default enabled");
+ 							$( '#datecontainer').css("display", "block");
+ 							$( '#ratingcontainer').css("display", "block");
+ 							$( '#reviewcontainer').css("display", "block");
  						};
  					})(result, title, year));
  				}
- 				console.log(data);
  			},
  			'error': function() {
  				alert('There was a problem.');
@@ -59,7 +63,7 @@ var updateMovie = function(title, id) {
 
  function addMovie() {
  	newMovie.dateWatched = $('#date-watched').val();
- 	newMovie.rating = $('#rating').val();
+ 	newMovie.rating = $('#rating-system').val();
  	newMovie.review = $('#review').val().trim();
  	console.log(newMovie);
  	var currentURL = $(location).attr('href');
@@ -84,13 +88,8 @@ function renderMovies() {
 }
 
   $('#new-movie').on('keypress', function(e){
-           if (e.which == 13) {
-                searchResults();
-           }
-           else {
-           		console.log("Yep")
-           		$( "#searchresults" ).html('');
-           }
+           clearTimeout(timeoutId);
+           timeoutId = setTimeout(searchResults, 200);
         });
 
   $('#addMovie').on('click', function(){

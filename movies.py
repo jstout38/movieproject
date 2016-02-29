@@ -6,7 +6,7 @@ from sqlalchemy.orm import sessionmaker
 from database_setup import Base, User, Movie
 
 from flask import session as login_session
-import random, string
+import random, string, time
 
 from oauth2client.client import flow_from_clientsecrets
 from oauth2client.client import FlowExchangeError
@@ -43,6 +43,15 @@ def inject_login():
 		except:
 			return None
 	return dict(login=current_login)
+
+@app.context_processor
+def inject_picture():
+	def current_picture():
+		try:
+			return login_session['picture']
+		except:
+			return None
+	return dict(picture=current_picture)
 
 @app.route('/')
 @app.route('/users/')
@@ -120,15 +129,16 @@ def gconnect():
 	login_session['user_id'] = user_id
 	
 
-	output = ''
-	output +='<h1>Welcome, '
-	output += login_session['username']
+	output = 'Logged in!'
+	#output +='<h1>Welcome, '
+	#output += login_session['username']
 
-	output += '!</h1>'
-	output += '<img src="'
-	output += login_session['picture']
-	output +=' " style = "width: 300px; height: 300px;border-radius: 150px;-webkit-border-radius: 150px;-moz-border-radius: 150px;"> '
-	flash("you are now logged in as %s" %login_session['username'])
+	#output += '!</h1>'
+	#output += '<img src="'
+	#output += login_session['picture']
+	#output +=' " style = "width: 300px; height: 300px;border-radius: 150px;-webkit-border-radius: 150px;-moz-border-radius: 150px;"> '
+	#flash("you are now logged in as %s" %login_session['username'])
+	#return output
 	return output
 
 @app.route('/fbconnect', methods=['POST'])
@@ -239,7 +249,7 @@ def newUser():
 	if 'username' not in login_session:
 		return redirect('/login')
 	if request.method == 'POST':
-		newUser = User(name = request.form['name'], email = request.form['email'])
+		newUser = User(name = request.form['name'], email = request.form['email'], picture = request.form['pic'])
 		session.add(newUser)
 		session.commit()
 		flash("user created")
@@ -283,7 +293,7 @@ def deleteUser(user_id):
 @app.route('/user/<int:user_id>/movies/')
 def showMovies(user_id):
 	currentUser = session.query(User).filter_by(id=user_id).one()
-	movielist = session.query(Movie).filter_by(user_id = user_id).all()
+	movielist = session.query(Movie).filter_by(user_id = user_id).order_by(Movie.datewatched.desc()).all()
 	if 'username' in login_session:
 		if login_session['email'] == currentUser.email:
 			return render_template('showMovies.html', user = currentUser, movies = movielist)
@@ -293,8 +303,8 @@ def showMovies(user_id):
 @app.route('/user/<int:user_id>/add/', methods=['GET', 'POST'])
 def addMovie(user_id):
 	currentUser = session.query(User).filter_by(id=user_id).one()
-	if login_session['email'] != currentUser.email:
-		return redirect('/')
+	#if login_session['email'] != currentUser.email:
+		#return redirect('/')
 	if request.method == 'POST':
 		newMovie = Movie(name = request.form['title'], datewatched = request.form['dateWatched'], review = request.form['review'], mdbid = request.form['mdbid'], rating = request.form['rating'], user_id = user_id)
 		session.add(newMovie)
@@ -329,8 +339,8 @@ def editMovie(user_id, movie_id):
 @app.route('/user/<int:user_id>/<int:movie_id>/delete/', methods=['GET', 'POST'])
 def deleteMovie(user_id, movie_id):
 	currentUser = session.query(User).filter_by(id=user_id).one()
-	if login_session['email'] != currentUser.email:
-		return redirect('/')
+	#if login_session['email'] != currentUser.email:
+		#return redirect('/')
 	currentMovie = session.query(Movie).filter_by(id=movie_id).one()
 	if request.method == 'POST':
 		session.delete(currentMovie)

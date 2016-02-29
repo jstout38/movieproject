@@ -6,6 +6,7 @@
 {% endif %}
 {% block content %}
 	<div class = "row">
+	<div class="col-md-6">
 	<h1>Movie List for {{user.name}}!</h1>
 
 	{% with messages = get_flashed_messages() %}
@@ -19,22 +20,29 @@
     {% endif %}
     {% endwith %}
 </div>
-    
+</div>    
 	<div class="row">
 	<div class="col-md-1"></div>
 	<div class="col-md-10">
 	<div class="table-responsive">
-	<table class="table table-bordered">
+	<table class="table">
 	<thead>
-	<tr>
+	<!--<tr>
+	<th>Date Watched</th>
 	<th>Title</th>
 	<th>Description</th>
 	<th>Review</th>
-	</tr>
+	<th>Rating</th>
+	</tr>-->
 	</thead>
 	<tbody>
 	{% for movie in movies %}
 	<tr>
+	<th id="datecell{{movie.mdbid}}" class="col-md-2"></th>
+		<script type="text/javascript">
+			var datewatched = "{{movie.datewatched}}";
+			$('#datecell{{movie.mdbid}}').append(moment(datewatched, 'YYYY-MM-DD').format('MMMM Do YYYY'));
+		</script>
 	<th id="{{movie.mdbid}}"></th>
 		<script type="text/javascript">
 			var key = '924332c90e5f89d0bc88e02232ff0723';
@@ -49,16 +57,19 @@
 				'async': false,
 				'success': function(data, textStats, XMLHttpRequest) {
 					console.log(data);
-					$('#{{movie.mdbid}}').append('<img width=100 src="https://image.tmdb.org/t/p/w396/' + data.poster_path + '"><a href="{{ url_for('editMovie', user_id = user.id, movie_id = movie.id) }}">(Edit)</a> <a href="{{ url_for('deleteMovie', user_id = user.id, movie_id = movie.id) }}">(Delete)</a>');
-					$('#desc{{movie.mdbid}}').append(data.overview);
+					$('#{{movie.mdbid}}').append('<img width=100 src="https://image.tmdb.org/t/p/w396/' + data.poster_path + '">');
+					$('#desc{{movie.mdbid}}').append('<h4>' + data.title + '</h4>' + data.overview);
 				},
 				'error': function() {
-					alert('There was a problem.');
+					console.log('There was a problem.');
 				}
 			});
 		</script>
 	<th id="desc{{movie.mdbid}}"></th>
 	<th>{{movie.review}}</th>
+	<th>{{movie.rating}}</th>
+	<th><a href="{{ url_for('editMovie', user_id = user.id, movie_id = movie.id) }}">(Edit)</a></th>
+	<th><a href="{{ url_for('deleteMovie', user_id = user.id, movie_id = movie.id) }}">(Delete)</a></th>
 
 	{% endfor %}
 	</tbody>
