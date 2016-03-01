@@ -63,11 +63,16 @@ var updateMovie = function(title, id) {
 
  function addMovie() {
  	newMovie.dateWatched = $('#date-watched').val();
+ 	if (newMovie.dateWatched == '') {
+ 		alert('You must select a date!');
+ 	}
  	newMovie.rating = $('#rating-system').val();
  	newMovie.review = $('#review').val().trim();
  	console.log(newMovie);
  	var currentURL = $(location).attr('href');
-	var userID = currentURL.substring(currentURL.length - 6, currentURL.length - 5);
+	var cutoff = currentURL.lastIndexOf("user");
+	var userID = currentURL.substring(cutoff + 5, currentURL.length);
+	userID = userID.replace('/add/','');
 	console.log(userID);
 	$.ajax({
 		url: '/user/' + userID + '/add/',

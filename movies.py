@@ -306,6 +306,8 @@ def addMovie(user_id):
 	#if login_session['email'] != currentUser.email:
 		#return redirect('/')
 	if request.method == 'POST':
+		if request.form['dateWatched'] == '':
+			return redirect(url_for('addMovie', user_id = user_id))
 		newMovie = Movie(name = request.form['title'], datewatched = request.form['dateWatched'], review = request.form['review'], mdbid = request.form['mdbid'], rating = request.form['rating'], user_id = user_id)
 		session.add(newMovie)
 		session.commit()

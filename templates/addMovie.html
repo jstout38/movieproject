@@ -8,6 +8,17 @@
 
 <h2>What have you been watching?</h2>
 
+{% with messages = get_flashed_messages() %}
+    {% if messages %}
+
+        <ul>
+        {% for message in messages %}
+          <li><strong>{{ message }} </strong> </li>
+        {% endfor %}
+      </ul>
+    {% endif %}
+    {% endwith %}
+
 <!--<form action="{{ url_for('addMovie', user_id = user.id) }}" method = post>
 
 	<p>Name:</p>
@@ -26,27 +37,27 @@
 </div>
 		<div class = "row">
 			<!-- div to contain the results of the search, will not be displayed until necessary -->
-			<div class="col-xs-4">
+			<div class="col-xs-6">
 			<ul id="searchresults" class="list-group"></ul>
 			</div>
 		</div>
 		<div class = "row">
-		<div class = "col-xs-4" id="movie-container"></div>
+		<div class = "col-xs-6" id="movie-container"></div>
 		</div>
 		<div class = "row" id="datecontainer">
-		<div class = "col-xs-4">
+		<div class = "col-xs-6">
 		<label for="date-watched">Date watched:</label>
 		<input type="date" class="form-control" id="date-watched" default="today">
 		</div>
 		</div>
 		<div class = "row" id="ratingcontainer">
-		<div class = "col-xs-4">
+		<div class = "col-xs-6">
 		<label for="rating">Your rating (1 to 5 stars):</label>
 		<input id="rating-system" type="number" class="rating" min="0" max="5" step="1">
 		</div>
 		</div>
 		<div class = "row" id="reviewcontainer">
-		<div class = "col-xs-4" id="reviewbox">
+		<div class = "col-xs-6" id="reviewbox">
 		<textarea class="form-control" id="review" rows="8" placeholder="Your review! What did you think?"></textarea>
 		</div>
 		</div>
