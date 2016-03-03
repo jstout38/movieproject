@@ -59,7 +59,14 @@ def users():
 	state = ''.join(random.choice(string.ascii_uppercase + string.digits) for x in xrange(32))
 	login_session['state'] = state
 	userlist = session.query(User).all()
-	return render_template('users.html', users = userlist)
+	movies = {}
+	for user in userlist:
+		userMovies = session.query(Movie).filter_by(user_id = user.id).order_by(Movie.datewatched.desc()).limit(4)
+		movies[user.email] = []
+		for movie in userMovies:
+			movies[user.email].append(movie.mdbid)
+	print movies
+	return render_template('users.html', users = userlist, movies = movies)
 	#return "Here is a list of users"
 
 @app.route('/gconnect', methods=['POST'])

@@ -7,11 +7,9 @@
 {% block content %}
 
 	<div class="row">
-	<div class="col-md-1"></div>
-	<div class="col-md-11">
 	<h1>Welcome to the Movie Log!</h1>
-	<h3>Check out what our members have been watching by clicking on their user profile below!</h3>
-	</div>
+	<h3>Here's what our users have been watching:</h3>
+	<h3 id="youlogin">Create an account and start logging today!</h3>
 	</div>
 	
 	 {% with messages = get_flashed_messages() %}
@@ -24,18 +22,46 @@
       </ul>
     {% endif %}
     {% endwith %}
+
+
     
     <div class="row">
-    <div class="col-md-1"></div>
-    <div class="col-md-10">
+    <div class="col-md-7 main-table">
 	<div class="table-responsive">
-	<table class="table table-bordered table-hover">
+	<table class="table table-hover user-table">
 	<tbody>
 	{% for user in users %}
 	<tr>
-	<th><a href="{{ url_for('showMovies', user_id = user.id) }}">{{user.name}}</a></th>
-	<th><a href="{{ url_for('editUser', user_id = user.id) }}">(edit)</a></th>
-	<th><a href="{{ url_for('deleteUser', user_id = user.id) }}">(delete)</a></br></th>
+	<td width=150><img src = "{{user.picture}}" width=125></td>
+	<td class="col-md-2"><a href="{{ url_for('showMovies', user_id = user.id) }}">{{user.name}}</a></td>
+	<td>
+	<div class="row movieimages">
+	{% for movie in movies[user.email] %}
+	<div id="{{movie}}" class="movieimages">
+	<script type="text/javascript">
+			var key = '924332c90e5f89d0bc88e02232ff0723';
+			var id = {{movie}};
+			var url = 'https://api.themoviedb.org/3/movie/' + id + '?api_key=' + key;
+
+			$.ajax({
+				'url': url,
+				'dataType': 'jsonp',
+				'type': 'GET',
+				'contentType': 'application/json',
+				'async': false,
+				'success': function(data, textStats, XMLHttpRequest) {
+					console.log(data);
+					$('#{{movie}}').append('<img width=125 src="https://image.tmdb.org/t/p/w396/' + data.poster_path + '">');
+				},
+				'error': function() {
+					console.log('There was a problem.');
+				}
+			});
+		</script>
+	</div>
+	{% endfor %}
+	</div>
+	</td>
 	{% endfor %}
 	</tbody>
 	</table>
