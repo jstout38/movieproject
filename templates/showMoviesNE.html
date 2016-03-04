@@ -38,12 +38,12 @@
 	<tbody>
 	{% for movie in movies %}
 	<tr>
-	<td id="datecell{{movie.mdbid}}" class="col-md-2"></th>
+	<td id="datecell{{movie.mdbid}}" class="col-md-2"></td>
 		<script type="text/javascript">
 			var datewatched = "{{movie.datewatched}}";
-			$('#datecell{{movie.mdbid}}').append(moment(datewatched, 'YYYY-MM-DD').format('MMMM Do YYYY'));
+			$('#datecell{{movie.mdbid}}').append(moment(datewatched, 'YYYY-MM-DD').format('MMMM Do, YYYY') + '<br><input value={{movie.rating}} data-size="xs" class="rating-loading">');
 		</script>
-	<td id="{{movie.mdbid}}"></th>
+	<td id="{{movie.mdbid}}"></td>
 		<script type="text/javascript">
 			var key = '924332c90e5f89d0bc88e02232ff0723';
 			var id = {{movie.mdbid}};
@@ -65,11 +65,8 @@
 				}
 			});
 		</script>
-	<td id="desc{{movie.mdbid}}"></th>
-	<td>{{movie.review}}</th>
-	<td>{{movie.rating}}</th>
-	
-	
+	<td id="desc{{movie.mdbid}}"></td>
+	<td>{{movie.review}}</td>	
 
 	{% endfor %}
 	</tbody>
@@ -78,8 +75,10 @@
 	</div>
 	</div>
 
-	<h3><a href="{{ url_for('addMovie', user_id = user.id) }}">Add New Movie</a></h3>
-
-	<h3><a href="{{ url_for('users') }}">Back to User List</a></h3>
+	<script>
+	$(document).on('ready', function(){
+		$('.rating-loading').rating({displayOnly: true});
+	});
+	</script>
 
 {% endblock %}
