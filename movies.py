@@ -138,7 +138,6 @@ def gconnect():
 	login_session['user_id'] = user_id
 	
 
-	output = 'Logged in!'
 	#output +='<h1>Welcome, '
 	#output += login_session['username']
 
@@ -148,7 +147,8 @@ def gconnect():
 	#output +=' " style = "width: 300px; height: 300px;border-radius: 150px;-webkit-border-radius: 150px;-moz-border-radius: 150px;"> '
 	#flash("you are now logged in as %s" %login_session['username'])
 	#return output
-	return output
+	#return login_session['user_id'].str()
+	return str(login_session['user_id'])
 
 @app.route('/fbconnect', methods=['POST'])
 def fbconnect():
@@ -188,18 +188,18 @@ def fbconnect():
 
 	user_id = getUserID(login_session['email'])
 	if not user_id:
-		user_id = createUser(login_session)
+		user_id = CreateUser(login_session)
 	login_session['user_id'] = user_id
 
-	output = ''
-	output +='<h1>Welcome, '
-	output += login_session['username']
+	#output = ''
+	#output +='<h1>Welcome, '
+	#output += login_session['username']
 
-	output +='!</h1>'
-	output +='!<img src="'
-	output += login_session['picture']
-	output +=' " style = "width: 300px; height: 300px;border-radius: 150px;-webkit-border-radius: 150px;-moz-border-radius: 150px;"> '
-	return output
+	#output +='!</h1>'
+	#output +='!<img src="'
+	#output += login_session['picture']
+	#output +=' " style = "width: 300px; height: 300px;border-radius: 150px;-webkit-border-radius: 150px;-moz-border-radius: 150px;"> '
+	return str(user_id)
 
 @app.route("/gdisconnect")
 def gdisconnect():

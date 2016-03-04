@@ -1,9 +1,12 @@
 	<div class="container-fluid">
 	<div class="row top-menu">
-	<div class="col-md-6">
+	<div class="col-md-4">
 		<a href="{{ url_for('users') }}"><img id="logo" src = "{{ url_for('static', filename='images/logo.jpg') }}" alt="The Movie Log!"></a>
 	</div>
-	<div class="col-md-6 text-right">
+	<div class="col-md-4">
+		<div id="result"></div>
+	</div>
+	<div class="col-md-4 text-right">
 					
 			
 
@@ -21,7 +24,7 @@
 			data-width="25px">
 		</span>
 	</div>
-	<div id="result"></div>
+	
 
 	<script>
 	function signInCallback(authResult) {
@@ -37,9 +40,10 @@
 				contentType: 'application/octet-stream; charset=utf-8',
 				success: function(result) {
 					if (result) {
-						$('#result').html('Login Successful!</br>' + result + '</br>Redirecting...')
+						console.log(result);
+						$('#result').html('<h3 class="redirecting">Login Successful! Redirecting...</h3>')
 						setTimeout(function() {
-							window.location.href = "/";
+							window.location.href = "/" + "user/" + result + "/movies/";
 						}, 4000);
 
 					} else if (authResult['error']) {
@@ -78,15 +82,19 @@
 					data: access_token,
 					contentType: 'application/octet-stream; charset=utf-8',
 					success: function(result) {
-						if (result) {
-							$('#result').html('Login Successful!</br>' + result + '</br>Redirecting...')
-							setTimeout(function() {
-								window.location.href = "/";
-							}, 4000);
-						} else {
-							$('#result').html('Failed to make a server-side call. Check your configuration and console.')
-						}
+					if (result) {
+						console.log(result);
+						$('#result').html('<h3 class="redirecting">Login Successful! Redirecting...</h3>')
+						setTimeout(function() {
+							window.location.href = "/" + "user/" + result + "/movies/";
+						}, 4000);
+
+					} else if (authResult['error']) {
+						console.log('There was an error: ' + authResult['error']);
+					} else {
+						$('#result').html('Failed to make a server-side call. Check your configuration and console.')	
 					}
+				}
 				});
 			});
 		}
@@ -94,7 +102,9 @@
 
 <div class="fb-login-button" data-size="large" data-show-faces="false" data-auto-logout-link="false" scope="public_profile,email" onlogin="sendTokenToServer();"></div>
 <h4 style="float: right">Log In/Create Account: </h4>
+
 </div>
+
 
 
 </div>
