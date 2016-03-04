@@ -43,6 +43,7 @@
 	<td id="datecell{{movie.mdbid}}" class="col-md-2"></td>
 		<script type="text/javascript">
 			var datewatched = "{{movie.datewatched}}";
+			console.log(datewatched);
 			$('#datecell{{movie.mdbid}}').append(moment(datewatched, 'YYYY-MM-DD').format('MMMM Do, YYYY') + '<br><input value={{movie.rating}} data-size="xs" class="rating-loading">');
 		</script>
 	<td id="{{movie.mdbid}}"></td>

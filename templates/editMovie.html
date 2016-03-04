@@ -6,17 +6,60 @@
 {% endif %}
 {% block content %}
 
-<h1>Edit {{movie.name}}</h1>
 
-<form action="{{ url_for('editMovie', user_id = user.id, movie_id = movie.id) }}" method = post>
+		<div class = "row">
+			<!-- div to contain the results of the search, will not be displayed until necessary -->
+			<div class="col-xs-6">
+			<ul id="searchresults" class="list-group"></ul>
+			</div>
+		</div>
+		<div class = "row">
+		<div class = "col-xs-6" id="edit-movie-container"></div>
+		</div>
+		<div class = "row" id="edit-datecontainer">
+		<div class = "col-xs-6">
+		<label for="date-watched">Date watched:</label>
+		<input type="date" class="form-control" id="date-watched" default="today" value="{{movie.datewatched}}">
+		</div>
+		</div>
+		<div class = "row" id="edit-ratingcontainer">
+		<div class = "col-xs-6">
+		<label for="rating">Your rating (1 to 5 stars):</label>
+		<input id="rating-system" type="number" class="rating" value="{{movie.rating}}" min="0" max="5" step="1">
+		</div>
+		</div>
+		<div class = "row" id="edit-reviewcontainer">
+		<div class = "col-xs-6" id="reviewbox">
+		<textarea class="form-control" id="review" rows="8">{{movie.review}}</textarea>
+		</div>
+		</div>
+		<button type="submit" id = "editMovie" class="btn btn-default">Update your information!</button>
+		<a href="{{ url_for('showMovies', user_id = user.id) }}" class="btn btn-default" role="button">Cancel</a>
+		</form>
+		<script>
+		$(document).on('ready', function(){
+			var key = '924332c90e5f89d0bc88e02232ff0723';
+ 			var id = {{movie.mdbid}};
+ 			var url = 'https://api.themoviedb.org/3/movie/' + id + '?api_key=' + key;
 
-	<p>Name:</p>
-	  <input type = 'text' size = '30' name = 'name' placeholder = "{{movie.name}}">
-	<p>Description:</p>
-	  <input type = 'text' size = '250' name = 'description' placeholder = "{{movie.description}}">
-	<p>Review:</p>
-	  <input type = 'text' size = '250' name = 'review' placeholder = "{{movie.review}}">
-	  <p><input type = 'submit' value = 'Edit'></p>
-	  <a href = "{{ url_for('showMovies', user_id = user.id) }}">Cancel</a>
-</form>
+			$.ajax({
+				'url': url,
+				'dataType': 'jsonp',
+				'type': 'GET',
+				'contentType': 'application/json',
+				'async': false,
+				'success': function(data, textStats, XMLHttpRequest) {
+					console.log(data);
+					$('#edit-movie-container' ).append('<h2 id="searchtitle">' + data.title + ' (' + data.release_date.substring(0,4) + ')</h2>');
+ 					$('#edit-movie-container' ).append('<img width=200 src="https://image.tmdb.org/t/p/w396/' + data.poster_path + '">');
+ 					$('#edit-movie-container' ).append('<p>' + data.overview + '</p>');
+				},
+				'error': function() {
+					console.log('There was a problem.');
+				} 		
+ 			});
+ 		});
+		
+	</script>
+
 {% endblock %}

@@ -6,6 +6,12 @@ var newMovie = {
 	review: ''
 }
 
+var editInfo = {
+	dateWatched: '',
+	rating: 0,
+	review: ''
+}
+
 var timeoutId;
 
 var updateMovie = function(title, id) {
@@ -42,7 +48,7 @@ var updateMovie = function(title, id) {
  							$( '#searchresults' ).html('');
  							$('#new-movie').val('');
  							$( '#movie-container' ).html('');
- 							$( '#movie-container' ).append('<h3 id="searchtitle">' + title + ' (' + year + ')</h3>');
+ 							$( '#movie-container' ).append('<h2 id="searchtitle">' + title + ' (' + year + ')</h2>');
  							$( '#movie-container' ).append('<img width=200 src="https://image.tmdb.org/t/p/w396/' + result.poster_path + '">');
  							$( '#movie-container' ).append('<p>' + result.overview + '</p>');
  							$( '#addMovie').attr("class", "btn btn-default enabled");
@@ -88,8 +94,27 @@ var updateMovie = function(title, id) {
 	});	
  }
 
-function renderMovies() {
-
+function editMovie() {
+	editInfo.dateWatched = $('#date-watched').val();
+	editInfo.rating = $('#rating-system').val();
+	editInfo.review = $('#review').val();
+	console.log(editInfo);
+	var currentURL = $(location).attr('href');
+	var cutoff = currentURL.lastIndexOf("user");
+	var userID = currentURL.substring(cutoff + 5, currentURL.length);
+	userID = userID.replace('/edit/', '');
+	$.ajax({
+		url: '/user/' + userID + '/edit/',
+		data: editInfo,
+		type: 'POST',
+		dataType: 'json',
+		success: function(response) {
+			window.location.href = response.redirect_url;
+		},
+		error: function(error) {
+			console.log(error);
+		}
+	});
 }
 
   $('#new-movie').on('keypress', function(e){
@@ -99,6 +124,10 @@ function renderMovies() {
 
   $('#addMovie').on('click', function(){
   		addMovie();
+  });
+
+  $('#editMovie').on('click', function(){
+  		editMovie();
   });
 
   

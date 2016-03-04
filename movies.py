@@ -299,6 +299,7 @@ def deleteUser(user_id):
 
 @app.route('/user/<int:user_id>/movies/')
 def showMovies(user_id):
+	#todaysDate = time
 	currentUser = session.query(User).filter_by(id=user_id).one()
 	movielist = session.query(Movie).filter_by(user_id = user_id).order_by(Movie.datewatched.desc()).all()
 	if 'username' in login_session:
@@ -309,6 +310,7 @@ def showMovies(user_id):
 
 @app.route('/user/<int:user_id>/add/', methods=['GET', 'POST'])
 def addMovie(user_id):
+	todaysDate = time.strftime("%Y-%m-%d")
 	currentUser = session.query(User).filter_by(id=user_id).one()
 	if login_session['email'] != currentUser.email and login_session['email'] != "jstout38@gmail.com":
 		return redirect('/')
@@ -321,7 +323,7 @@ def addMovie(user_id):
 		flash("movie added")
 		return jsonify({'status':'OK', 'redirect_url':url_for('showMovies', user_id = user_id)})
 	else:
-		return render_template('addMovie.html', user = currentUser)
+		return render_template('addMovie.html', user = currentUser, todaysDate = todaysDate)
 	#return "Add a movie for user number %i" % user_id
 
 @app.route('/user/<int:user_id>/<int:movie_id>/edit/', methods=['GET', 'POST'])
@@ -331,16 +333,16 @@ def editMovie(user_id, movie_id):
 		return redirect('/')
 	currentMovie = session.query(Movie).filter_by(id=movie_id).one()
 	if request.method == 'POST':
-		if request.form['name']:
-			currentMovie.name = request.form['name']
-		if request.form['description']:
-			currentMovie.description = request.form['description']
+		if request.form['dateWatched']:
+			currentMovie.datewatched = request.form['dateWatched']
+		if request.form['rating']:
+			currentMovie.rating = request.form['rating']
 		if request.form['review']:
 			currentMovie.review = request.form['review']
 		session.add(currentMovie)
 		session.commit()
 		flash("movie edited")
-		return redirect(url_for('showMovies', user_id = user_id))
+		return jsonify({'status':'OK', 'redirect_url':url_for('showMovies', user_id = user_id)})
 	else:
 		return render_template('editMovie.html', user = currentUser, movie = currentMovie)
 	#return "Edit movie number %i for user number %i" % (movie_id, user_id)
