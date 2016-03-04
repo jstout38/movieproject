@@ -3,7 +3,7 @@ h1, h2, h3 {color: white;}
 #searchtitle {margin-top: 0px;}
 p {color: white;}
 .control-label {color: white;}
-th {color: white;}
+td {color: white;}
 label {color: white; padding-top: 5px;}
 
 #signinbutton, .fb-login-button {float: right; padding: 5px;}

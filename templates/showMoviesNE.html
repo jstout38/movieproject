@@ -25,7 +25,7 @@
 	<div class="col-md-1"></div>
 	<div class="col-md-10">
 	<div class="table-responsive">
-	<table class="table">
+	<table class="table user-table">
 	<thead>
 	<!--<tr>
 	<th>Date Watched</th>
@@ -38,12 +38,12 @@
 	<tbody>
 	{% for movie in movies %}
 	<tr>
-	<th id="datecell{{movie.mdbid}}" class="col-md-2"></th>
+	<td id="datecell{{movie.mdbid}}" class="col-md-2"></th>
 		<script type="text/javascript">
 			var datewatched = "{{movie.datewatched}}";
 			$('#datecell{{movie.mdbid}}').append(moment(datewatched, 'YYYY-MM-DD').format('MMMM Do YYYY'));
 		</script>
-	<th id="{{movie.mdbid}}"></th>
+	<td id="{{movie.mdbid}}"></th>
 		<script type="text/javascript">
 			var key = '924332c90e5f89d0bc88e02232ff0723';
 			var id = {{movie.mdbid}};
@@ -65,9 +65,9 @@
 				}
 			});
 		</script>
-	<th id="desc{{movie.mdbid}}"></th>
-	<th>{{movie.review}}</th>
-	<th>{{movie.rating}}</th>
+	<td id="desc{{movie.mdbid}}"></th>
+	<td>{{movie.review}}</th>
+	<td>{{movie.rating}}</th>
 	
 	
 

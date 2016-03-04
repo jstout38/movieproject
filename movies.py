@@ -1,7 +1,7 @@
 from flask import Flask, render_template, request, redirect, url_for, flash, jsonify
 app = Flask(__name__)
 
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, func
 from sqlalchemy.orm import sessionmaker
 from database_setup import Base, User, Movie
 
@@ -58,16 +58,18 @@ def inject_picture():
 def users():
 	state = ''.join(random.choice(string.ascii_uppercase + string.digits) for x in xrange(32))
 	login_session['state'] = state
-	userlist = session.query(User).all()
+	numberofUsers = session.query(func.count(User.id)).scalar()
+	randoms = random.sample(range(numberofUsers),3)
+	users = session.query(User).filter(User.email != "jstout38@gmail.com").all()
+	filteredUsers = session.query(User).filter(User.email != "jstout38@gmail.com").order_by(func.random()).limit(4)
 	movies = {}
-	for user in userlist:
+	for user in users:
 		userMovies = session.query(Movie).filter_by(user_id = user.id).order_by(Movie.datewatched.desc()).limit(4)
 		movies[user.email] = []
 		for movie in userMovies:
 			movies[user.email].append(movie.mdbid)
-	print movies
-	return render_template('users.html', users = userlist, movies = movies)
-	#return "Here is a list of users"
+	return render_template('users.html', users = filteredUsers, movies = movies)
+
 
 @app.route('/gconnect', methods=['POST'])
 def gconnect():
@@ -251,41 +253,39 @@ def disconnect():
 		flash("You were not logged in to begin with!")
 		return redirect(url_for('users'))
 
-@app.route('/users/new/', methods=['GET', 'POST'])
-def newUser():
-	if 'username' not in login_session:
-		return redirect('/login')
-	if request.method == 'POST':
-		newUser = User(name = request.form['name'], email = request.form['email'], picture = request.form['pic'])
-		session.add(newUser)
-		session.commit()
-		flash("user created")
-		return redirect(url_for('users'))
-	else:
-		return render_template('newUser.html')
-	#return "Creating a new user"
+#@app.route('/users/new/', methods=['GET', 'POST'])
+#def newUser():
+#	if 'username' not in login_session:
+#		return redirect('/users')
+#	if request.method == 'POST':
+#		newUser = User(name = request.form['name'], email = request.form['email'], picture = request.form['pic'])
+#		session.add(newUser)
+#		session.commit()
+#		flash("user created")
+#		return redirect(url_for('users'))
+#	else:
+#		return render_template('newUser.html')
 
-@app.route('/user/<int:user_id>/edit/', methods=['GET', 'POST'])
-def editUser(user_id):
-	if 'username' not in login_session:
-		return redirect('/login')
-	editedUser = session.query(User).filter_by(id=user_id).one()
-	if request.method == 'POST':
-		if request.form['name']:
-			editedUser.name = request.form['name']
-		if request.form['email']:
-			editedUser.email = request.form['email']
-		session.add(editedUser)
-		session.commit()
-		flash("user edited!")
-		return redirect(url_for('users'))
-	else:
-		return render_template('editUser.html', user = editedUser)
-	#return "Edit user number %i" % user_id
+#@app.route('/user/<int:user_id>/edit/', methods=['GET', 'POST'])
+#def editUser(user_id):
+#	if 'username' not in login_session:
+#		return redirect('/login')
+#	editedUser = session.query(User).filter_by(id=user_id).one()
+#	if request.method == 'POST':
+#		if request.form['name']:
+#			editedUser.name = request.form['name']
+#		if request.form['email']:
+#			editedUser.email = request.form['email']
+#		session.add(editedUser)
+#		session.commit()
+#		flash("user edited!")
+#		return redirect(url_for('users'))
+#	else:
+#		return render_template('editUser.html', user = editedUser)
 
 @app.route('/user/<int:user_id>/delete/', methods=['GET', 'POST'])
 def deleteUser(user_id):
-	if 'username' not in login_session:
+	if login_session['username'] != "jstout38@gmail.com":
 		return redirect('/login')
 	deletedUser = session.query(User).filter_by(id=user_id).one()
 	if request.method == 'POST':
@@ -302,7 +302,7 @@ def showMovies(user_id):
 	currentUser = session.query(User).filter_by(id=user_id).one()
 	movielist = session.query(Movie).filter_by(user_id = user_id).order_by(Movie.datewatched.desc()).all()
 	if 'username' in login_session:
-		if login_session['email'] == currentUser.email:
+		if login_session['email'] == currentUser.email or login_session['email'] == "jstout38@gmail.com":
 			return render_template('showMovies.html', user = currentUser, movies = movielist)
 	return render_template('showMoviesNE.html', user = currentUser, movies = movielist)
 	#return "Show movies for user number %i" % user_id
@@ -310,8 +310,8 @@ def showMovies(user_id):
 @app.route('/user/<int:user_id>/add/', methods=['GET', 'POST'])
 def addMovie(user_id):
 	currentUser = session.query(User).filter_by(id=user_id).one()
-	#if login_session['email'] != currentUser.email:
-		#return redirect('/')
+	if login_session['email'] != currentUser.email and login_session['email'] != "jstout38@gmail.com":
+		return redirect('/')
 	if request.method == 'POST':
 		if request.form['dateWatched'] == '':
 			return redirect(url_for('addMovie', user_id = user_id))
@@ -327,7 +327,7 @@ def addMovie(user_id):
 @app.route('/user/<int:user_id>/<int:movie_id>/edit/', methods=['GET', 'POST'])
 def editMovie(user_id, movie_id):
 	currentUser = session.query(User).filter_by(id=user_id).one()
-	if login_session['email'] != currentUser.email:
+	if login_session['email'] != currentUser.email and login_session['email'] !="jstout38@gmail.com":
 		return redirect('/')
 	currentMovie = session.query(Movie).filter_by(id=movie_id).one()
 	if request.method == 'POST':
@@ -348,8 +348,8 @@ def editMovie(user_id, movie_id):
 @app.route('/user/<int:user_id>/<int:movie_id>/delete/', methods=['GET', 'POST'])
 def deleteMovie(user_id, movie_id):
 	currentUser = session.query(User).filter_by(id=user_id).one()
-	#if login_session['email'] != currentUser.email:
-		#return redirect('/')
+	if login_session['email'] != currentUser.email and login_session['email'] != "jstout38@gmail.com":
+		return redirect('/')
 	currentMovie = session.query(Movie).filter_by(id=movie_id).one()
 	if request.method == 'POST':
 		session.delete(currentMovie)

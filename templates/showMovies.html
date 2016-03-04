@@ -7,7 +7,9 @@
 {% block content %}
 	<div class = "row">
 	<div class="col-md-6">
-	<h2>Movie List for {{user.name}}!</h2>
+	<h2>Here's what you've been watching!
+
+	<a href="{{ url_for('addMovie', user_id = user.id) }}">(Add New Movie)</a>
 
 	{% with messages = get_flashed_messages() %}
     {% if messages %}
@@ -25,7 +27,7 @@
 	<div class="col-md-1"></div>
 	<div class="col-md-10">
 	<div class="table-responsive">
-	<table class="table">
+	<table class="table user-table">
 	<thead>
 	<!--<tr>
 	<th>Date Watched</th>
@@ -38,12 +40,12 @@
 	<tbody>
 	{% for movie in movies %}
 	<tr>
-	<th id="datecell{{movie.mdbid}}" class="col-md-2"></th>
+	<td id="datecell{{movie.mdbid}}" class="col-md-2"></th>
 		<script type="text/javascript">
 			var datewatched = "{{movie.datewatched}}";
 			$('#datecell{{movie.mdbid}}').append(moment(datewatched, 'YYYY-MM-DD').format('MMMM Do YYYY'));
 		</script>
-	<th id="{{movie.mdbid}}"></th>
+	<td id="{{movie.mdbid}}"></th>
 		<script type="text/javascript">
 			var key = '924332c90e5f89d0bc88e02232ff0723';
 			var id = {{movie.mdbid}};
@@ -65,11 +67,11 @@
 				}
 			});
 		</script>
-	<th id="desc{{movie.mdbid}}"></th>
-	<th>{{movie.review}}</th>
-	<th>{{movie.rating}}</th>
-	<th><a href="{{ url_for('editMovie', user_id = user.id, movie_id = movie.id) }}">(Edit)</a></th>
-	<th><a href="{{ url_for('deleteMovie', user_id = user.id, movie_id = movie.id) }}">(Delete)</a></th>
+	<td id="desc{{movie.mdbid}}"></th>
+	<td>{{movie.review}}</th>
+	<td>{{movie.rating}}</th>
+	<td><a href="{{ url_for('editMovie', user_id = user.id, movie_id = movie.id) }}">(Edit)</a></th>
+	<td><a href="{{ url_for('deleteMovie', user_id = user.id, movie_id = movie.id) }}">(Delete)</a></th>
 
 	{% endfor %}
 	</tbody>
@@ -77,9 +79,5 @@
 	</div>
 	</div>
 	</div>
-
-	<h3><a href="{{ url_for('addMovie', user_id = user.id) }}">Add New Movie</a></h3>
-
-	<h3><a href="{{ url_for('users') }}">Back to User List</a></h3>
 
 {% endblock %}
