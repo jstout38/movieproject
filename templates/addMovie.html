@@ -8,6 +8,7 @@
 
 <h2>What have you been watching?</h2>
 
+<div class = "row flash">
 {% with messages = get_flashed_messages() %}
     {% if messages %}
 
@@ -18,6 +19,7 @@
       </ul>
     {% endif %}
     {% endwith %}
+</div>
 
 <!--<form action="{{ url_for('addMovie', user_id = user.id) }}" method = post>
 

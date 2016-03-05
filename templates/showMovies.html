@@ -18,6 +18,9 @@
 	<div class="col-md-6">
 	<h4 id="deleteAccount"><a href="{{ url_for('deleteUser', user_id = user.id) }}">(Delete Account)</a></h4>
 	{% endif %}
+	</div>
+</div>
+	<div class="row flash">
 	{% with messages = get_flashed_messages() %}
     {% if messages %}
 
