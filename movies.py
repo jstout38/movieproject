@@ -20,7 +20,7 @@ APPLICATION_NAME = "The Movie List"
 
 state = ''
 
-engine = create_engine('sqlite:///movies.db')
+engine = create_engine('postgres://afmaywensnnldv:p5LzOYcun5fEgr5aougoyg917H@ec2-54-83-3-38.compute-1.amazonaws.com:5432/d60gq6hm9tap55')
 Base.metadata.bind = engine
 
 DBSession = sessionmaker(bind=engine)
@@ -424,7 +424,7 @@ def CreateUser(login_session):
 	user = session.query(User).filter_by(email = login_session['email']).one()
 	return user.id
 
-if __name__ == '__main__':
-	app.secret_key = 'super_secret_key'
-	app.debug = True
-	app.run(host = '0.0.0.0', port = 5000)
+#if __name__ == '__main__':
+app.secret_key = 'super_secret_key'
+app.debug = True
+#app.run(host = '0.0.0.0', port = 5000)
