@@ -129,12 +129,10 @@ def gconnect():
 	if not user_id:
 		output = ''
 		user_id = CreateUser(login_session)
-		output += '<h1>Welcome to the Movie Log, '
-		output += login_session['username']
-		output += '!</h1>'
+		output += 'Welcome! Redirecting to your page...'
 		flash("you have been registered")
 		login_session['user_id'] = user_id
-		return output
+		return jsonify({'message': output, 'user': str(user_id)})
 	login_session['user_id'] = user_id
 	
 
@@ -148,7 +146,8 @@ def gconnect():
 	#flash("you are now logged in as %s" %login_session['username'])
 	#return output
 	#return login_session['user_id'].str()
-	return str(login_session['user_id'])
+	output = 'Welcome Back! Redirecting...'
+	return jsonify({'message': output, 'user': str(login_session['user_id'])})
 
 @app.route('/fbconnect', methods=['POST'])
 def fbconnect():
@@ -188,7 +187,12 @@ def fbconnect():
 
 	user_id = getUserID(login_session['email'])
 	if not user_id:
+		output = ''
 		user_id = CreateUser(login_session)
+		output += 'Welcome! Redirecting to your page...'
+		flash("you have been registered")
+		login_session['user_id'] = user_id
+		return jsonify({'message': output, 'user': str(user_id)})
 	login_session['user_id'] = user_id
 
 	#output = ''
@@ -199,7 +203,8 @@ def fbconnect():
 	#output +='!<img src="'
 	#output += login_session['picture']
 	#output +=' " style = "width: 300px; height: 300px;border-radius: 150px;-webkit-border-radius: 150px;-moz-border-radius: 150px;"> '
-	return str(user_id)
+	output = 'Welcome Back! Redirecting...'
+	return jsonify({'message': output, 'user': str(login_session['user_id'])})
 
 @app.route("/gdisconnect")
 def gdisconnect():
@@ -285,31 +290,48 @@ def disconnect():
 
 @app.route('/user/<int:user_id>/delete/', methods=['GET', 'POST'])
 def deleteUser(user_id):
-	if login_session['username'] != "jstout38@gmail.com":
-		return redirect('/login')
-	deletedUser = session.query(User).filter_by(id=user_id).one()
+	if 'username' not in login_session:
+			return redirect('/')
+	currentUser = session.query(User).filter_by(id=user_id).one()
+	if login_session['email'] != currentUser.email and login_session['email'] !="jstout38@gmail.com":
+		return redirect('/')
 	if request.method == 'POST':
-		session.delete(deletedUser)
+		session.delete(currentUser)
 		session.commit()
 		flash("user deleted!")
-		return redirect(url_for('users'))
+		return redirect(url_for('disconnect'))
 	else:
-		return render_template('deleteUser.html', user = deletedUser)
+		return render_template('deleteUser.html', user = currentUser)
 	#return "Delete user number %i" % user_id
 
 @app.route('/user/<int:user_id>/movies/')
 def showMovies(user_id):
-	#todaysDate = time
-	currentUser = session.query(User).filter_by(id=user_id).one()
 	movielist = session.query(Movie).filter_by(user_id = user_id).order_by(Movie.datewatched.desc()).all()
+	if len(movielist)>5:
+		return redirect(url_for('showMoviesPages', user_id = user_id, page = 1))
+	isCurrentUser = False
+	currentUser = session.query(User).filter_by(id=user_id).one()
 	if 'username' in login_session:
-		if login_session['email'] == currentUser.email or login_session['email'] == "jstout38@gmail.com":
-			return render_template('showMovies.html', user = currentUser, movies = movielist)
-	return render_template('showMoviesNE.html', user = currentUser, movies = movielist)
-	#return "Show movies for user number %i" % user_id
+		if currentUser.email == login_session['email'] or login_session['email'] == "jstout38@gmail.com":
+			isCurrentUser = True
+	return render_template('showMovies.html', user = currentUser, movies = movielist, isCurrentUser = isCurrentUser, page = 0)
+	#return render_template('showMoviesNE.html', user = currentUser, movies = movielist, isCurrentUser = isCurrentUser)
+
+@app.route('/user/<int:user_id>/movies/p=<int:page>')
+def showMoviesPages(user_id, page):
+	isCurrentUser = False
+	currentUser = session.query(User).filter_by(id=user_id).one()
+	if 'username' in login_session:
+		if currentUser.email == login_session['email'] or login_session['email'] == "jstout38@gmail.com":
+			isCurrentUser = True
+	movielist = session.query(Movie).filter_by(user_id = user_id).order_by(Movie.datewatched.desc()).all()
+	filteredmovies = movielist[(page-1)*5:page*5]
+	return render_template('showMovies.html', user = currentUser, noPages = int((len(movielist) - 1)/5 + 1), movies = filteredmovies, isCurrentUser = isCurrentUser, page = page)
 
 @app.route('/user/<int:user_id>/add/', methods=['GET', 'POST'])
 def addMovie(user_id):
+	if 'username' not in login_session:
+			return redirect('/')
 	todaysDate = time.strftime("%Y-%m-%d")
 	currentUser = session.query(User).filter_by(id=user_id).one()
 	if login_session['email'] != currentUser.email and login_session['email'] != "jstout38@gmail.com":
@@ -328,6 +350,8 @@ def addMovie(user_id):
 
 @app.route('/user/<int:user_id>/<int:movie_id>/edit/', methods=['GET', 'POST'])
 def editMovie(user_id, movie_id):
+	if 'username' not in login_session:
+			return redirect('/')
 	currentUser = session.query(User).filter_by(id=user_id).one()
 	if login_session['email'] != currentUser.email and login_session['email'] !="jstout38@gmail.com":
 		return redirect('/')
@@ -349,6 +373,8 @@ def editMovie(user_id, movie_id):
 
 @app.route('/user/<int:user_id>/<int:movie_id>/delete/', methods=['GET', 'POST'])
 def deleteMovie(user_id, movie_id):
+	if 'username' not in login_session:
+			return redirect('/')
 	currentUser = session.query(User).filter_by(id=user_id).one()
 	if login_session['email'] != currentUser.email and login_session['email'] != "jstout38@gmail.com":
 		return redirect('/')

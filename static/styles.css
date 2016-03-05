@@ -22,6 +22,9 @@ h3 {text-align: center;}
 #result {margin: 0 auto;}
 #youlogin {color: red;}
 .redirecting {color: black;}
+#deleteAccount {text-align: right;}
+#pagecontainer {text-align: center;}
+#pages {display:inline-block; color: white; width:25px; border: 1px solid white; padding: 5px; margin: 5px;}
 
 /*body            { font-family: sans-serif; background-color: #333333; }
  h1, h2, h3, h4       { color: #CCCCCC; }

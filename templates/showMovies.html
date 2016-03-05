@@ -7,10 +7,17 @@
 {% block content %}
 	<div class = "row">
 	<div class="col-md-6">
+	{% if isCurrentUser %}
 	<h2>Here's what you've been watching!
-
-	<a href="{{ url_for('addMovie', user_id = user.id) }}">(Add New Movie)</a>
-
+	{% else %}
+	<h2>Here's what {{user.name}}'s been watching!</h2>
+	{% endif %}
+	{% if isCurrentUser %}
+	<a href="{{ url_for('addMovie', user_id = user.id) }}">(Add New Movie)</a></h2>
+	</div>
+	<div class="col-md-6">
+	<h4 id="deleteAccount"><a href="{{ url_for('deleteUser', user_id = user.id) }}">(Delete Account)</a></h4>
+	{% endif %}
 	{% with messages = get_flashed_messages() %}
     {% if messages %}
 
@@ -70,13 +77,30 @@
 		</script>
 	<td id="desc{{movie.mdbid}}"></td>
 	<td>{{movie.review}}</td>
+	{% if isCurrentUser %}
 	<td><a href="{{ url_for('editMovie', user_id = user.id, movie_id = movie.id) }}">(Edit)</a></td>
 	<td><a href="{{ url_for('deleteMovie', user_id = user.id, movie_id = movie.id) }}">(Delete)</a></td>
+	{% endif %}
 
 	{% endfor %}
 	</tbody>
 	</table>
 	</div>
+	{% if page > 0 %}
+	<h4 id = "pagecontainer">
+	{% for x in range(noPages) %}
+	<span id = "pages">
+	{% if page != x + 1 %}
+	<a href="{{ url_for('showMoviesPages', user_id = user.id, page = x + 1) }}">
+	{% endif %}
+	{{x+1}}
+	{% if page != x + 1 %}
+	</a>
+	{% endif %}
+	</span>
+	{% endfor %}
+	</h4>
+	{% endif %}
 	</div>
 	</div>
 	<script>
