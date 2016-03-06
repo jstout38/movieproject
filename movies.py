@@ -257,18 +257,19 @@ def disconnect():
 		flash("You were not logged in to begin with!")
 		return redirect(url_for('users'))
 
-#@app.route('/users/new/', methods=['GET', 'POST'])
-#def newUser():
-#	if 'username' not in login_session:
-#		return redirect('/users')
-#	if request.method == 'POST':
-#		newUser = User(name = request.form['name'], email = request.form['email'], picture = request.form['pic'])
-#		session.add(newUser)
-#		session.commit()
-#		flash("user created")
-#		return redirect(url_for('users'))
-#	else:
-#		return render_template('newUser.html')
+@app.route('/users/new/', methods=['GET', 'POST'])
+def newUser():
+	if 'username' not in login_session or login_session['email'] != 
+	'jstout38@gmail.com':
+		return redirect('/users')
+	if request.method == 'POST':
+		newUser = User(name = request.form['name'], email = request.form['email'], picture = request.form['pic'])
+		session.add(newUser)
+		session.commit()
+		flash("user created")
+		return redirect(url_for('users'))
+	else:
+		return render_template('newUser.html')
 
 #@app.route('/user/<int:user_id>/edit/', methods=['GET', 'POST'])
 #def editUser(user_id):
