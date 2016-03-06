@@ -15,7 +15,7 @@ class User(Base):
 	id = Column(Integer, primary_key = True)
 	email = Column(String(80))
 	picture = Column(String(250))
-	userItems = relationship("UserItem", cascade="all, delete-orphan")
+	movies = relationship("Movie", cascade="all, delete-orphan")
 
 	@property
 	def serialize(self):
@@ -38,7 +38,6 @@ class Movie(Base):
 	mdbid = Column(Integer)
 	user_id = Column(Integer, ForeignKey('user.id'))
 	user = relationship(User)
-	movieItems = relationship("MovieItem", cascade="all, delete-orphan")
 
 	@property
 	def serialize(self):

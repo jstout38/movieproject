@@ -59,7 +59,6 @@ def users():
 	state = ''.join(random.choice(string.ascii_uppercase + string.digits) for x in xrange(32))
 	login_session['state'] = state
 	numberofUsers = session.query(func.count(User.id)).scalar()
-	randoms = random.sample(range(numberofUsers),3)
 	users = session.query(User).filter(User.email != "jstout38@gmail.com").all()
 	filteredUsers = session.query(User).filter(User.email != "jstout38@gmail.com").order_by(func.random()).limit(4)
 	movies = {}
