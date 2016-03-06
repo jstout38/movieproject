@@ -259,8 +259,7 @@ def disconnect():
 
 @app.route('/users/new/', methods=['GET', 'POST'])
 def newUser():
-	if 'username' not in login_session or login_session['email'] != 
-	'jstout38@gmail.com':
+	if 'username' not in login_session or login_session['email'] != 'jstout38@gmail.com':
 		return redirect('/users')
 	if request.method == 'POST':
 		newUser = User(name = request.form['name'], email = request.form['email'], picture = request.form['pic'])
