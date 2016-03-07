@@ -34,7 +34,7 @@
 	{% for user in users %}
 	<tr>
 	<td width=150><img src = "{{user.picture}}" width=125></td>
-	<td><a href="{{ url_for('showMovies', user_id = user.id) }}">{{user.name}}</a></td>
+	<td><b><a href="{{ url_for('showMovies', user_id = user.id) }}">{{user.name}}</a></b></td>
 	<td>
 	<div class="row movieimages">
 	{% for movie in movies[user.email] %}
