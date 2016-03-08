@@ -387,6 +387,15 @@ def deleteMovie(user_id, movie_id):
 		return render_template('deleteMovie.html', user = currentUser, movie = currentMovie)
 	#return "Delete movie number %i for user number %i" % (movie_id, user_id)
 
+@app.route('/movielookup/<int:movie_id>/users/', methods=['POST'])
+def movieLookup(movie_id):
+	selectedMovies = session.query(Movie).filter_by(mdbid = movie_id).all()
+	usersWithMovie = []
+	for movie in selectedMovies:
+		usersWithMovie.append(session.query(User).filter_by(id = movie.user_id).one())
+	return jsonify(Users = [u.serialize for u in usersWithMovie])
+
+
 @app.route('/users/JSON')
 def usersJSON():
 	userlist = session.query(User).all()

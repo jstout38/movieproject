@@ -70,7 +70,7 @@
 				'async': false,
 				'success': function(data, textStats, XMLHttpRequest) {
 					console.log(data);
-					$('#{{movie.mdbid}}').append('<img width=100 src="https://image.tmdb.org/t/p/w396/' + data.poster_path + '">');
+					$('#{{movie.mdbid}}').append('<img data-toggle="modal" data-target="#movie-modal" data-movieid="{{movie.mdbid}}" width=100 src="https://image.tmdb.org/t/p/w396/' + data.poster_path + '">');
 					$('#desc{{movie.mdbid}}').append('<h4>' + data.title + '</h4>' + data.overview);
 				},
 				'error': function() {
@@ -105,6 +105,22 @@
 	</h4>
 	{% endif %}
 	</div>
+	</div>
+	<div id="movie-modal" class="modal fade" role="dialog">
+		<div class="modal-dialog">
+			<!-- Modal content-->
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal">&times;</button>
+					<h4 class="modal-title"></h4>
+				</div>
+				<div class="modal-body">
+					<div id="mb"></div>
+				</div>
+				<div class="modal-footer">
+				</div>
+			</div>
+		</div>
 	</div>
 	<script>
 	$(document).on('ready', function(){
