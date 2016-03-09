@@ -1,3 +1,4 @@
+<!-- Template for adding a movie, uses a form supplemented by javascript in movies.js -->
 {% extends "main.html" %}
 {% if login() == None %}
 	{% include "header.html" %}
@@ -8,6 +9,7 @@
 
 <h2>What have you been watching?</h2>
 
+<!-- Displays any flash messages -->
 <div class = "row flash">
 {% with messages = get_flashed_messages() %}
     {% if messages %}
@@ -21,50 +23,43 @@
     {% endwith %}
 </div>
 
-<!--<form action="{{ url_for('addMovie', user_id = user.id) }}" method = post>
-
-	<p>Name:</p>
-	  <input type = 'text' size = '30' name = 'name'>
-	<p>Description:</p>
-	  <input type = 'text' size = '250' name = 'description'>
-	<p>Review:</p>
-	  <input type = 'text' size = '250' name = 'review'>
-
-	<p> <input type = 'submit' value = 'Create'></p>
-</form>-->
 <div class = "row">
-<div class = "col-xs-4">
-<input id="new-movie" class="form-control" placeholder="What movie did you watch?" autofocus>
+<!-- Create a search box for finding movies -->
+	<div class = "col-xs-4">
+		<input id="new-movie" class="form-control" placeholder="What movie did you watch?" autofocus>
+	</div>
 </div>
+<div class = "row">
+<!-- div to contain the results of the search, will not be displayed until necessary -->
+	<div class="col-xs-6">
+		<ul id="searchresults" class="list-group"></ul>
+	</div>
 </div>
-		<div class = "row">
-			<!-- div to contain the results of the search, will not be displayed until necessary -->
-			<div class="col-xs-6">
-			<ul id="searchresults" class="list-group"></ul>
-			</div>
-		</div>
-		<div class = "row">
-		<div class = "col-xs-6" id="movie-container"></div>
-		</div>
-		<div class = "row" id="datecontainer">
-		<div class = "col-xs-6">
+<div class = "row">
+<!-- div to show the movie selected after search -->
+	<div class = "col-xs-6" id="movie-container"></div>
+</div>
+<div class = "row" id="datecontainer">
+<!-- date input, uses imported default date -->
+	<div class = "col-xs-6">
 		<label for="date-watched">Date watched:</label>
 		<input type="date" class="form-control" id="date-watched" value="{{todaysDate}}">
-		</div>
-		</div>
-		<div class = "row" id="ratingcontainer">
-		<div class = "col-xs-6">
+	</div>
+</div>
+<div class = "row" id="ratingcontainer">
+<!-- star rating input, uses a bootstrap addon -->
+	<div class = "col-xs-6">
 		<label for="rating">Your rating (1 to 5 stars):</label>
 		<input id="rating-system" type="number" class="rating" min="0" max="5" step="1">
-		</div>
-		</div>
-		<div class = "row" id="reviewcontainer">
-		<div class = "col-xs-6" id="reviewbox">
+	</div>
+</div>
+<div class = "row" id="reviewcontainer">
+<!-- textarea for inputting a review -->
+	<div class = "col-xs-6" id="reviewbox">
 		<textarea class="form-control" id="review" rows="8" placeholder="Your review! What did you think?"></textarea>
-		</div>
-		</div>
-		<button type="submit" id = "addMovie" class="btn btn-default disabled">Add your movie!</button>
-		<a href="{{ url_for('showMovies', user_id = user.id) }}" class="btn btn-default" role="button">Cancel</a>
-
+	</div>
+</div>
+<button type="submit" id = "addMovie" class="btn btn-default disabled">Add your movie!</button>
+<a href="{{ url_for('showMovies', user_id = user.id) }}" class="btn btn-default" role="button">Cancel</a>
 	
 {% endblock %}

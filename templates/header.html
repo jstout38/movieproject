@@ -1,112 +1,106 @@
-	<div class="container-fluid">
+<!-- Header to be included on every page as long as the user isn't logged in-->
+<div class="container-fluid">
 	<div class="row top-menu">
-	<div class="col-md-4">
-		<a href="{{ url_for('users') }}"><img id="logo" src = "{{ url_for('static', filename='images/logo.jpg') }}" alt="The Movie Log!"></a>
-	</div>
-	<div class="col-md-4">
-		<div id="result"></div>
-	</div>
-	<div class="col-md-4 text-right">
-					
-			
-
-		<div class = "row">
-
-	<div id="signInButton">
-		<span class="g-signin"
-			data-scope="openid email"
-			data-clientid="888856131964-dpsq7hb9pof9qsqp1i76ook5tt6mvgq8.apps.googleusercontent.com"
-			data-redirecturi='postmessage'
-			data-accesstype="offline"
-			data-cookiepolicy="single_host_origin"
-			data-callback="signInCallback"
-			data-approvalprompt="force"
-			data-width="25px">
-		</span>
-	</div>
-	
-
-	<script>
-	function signInCallback(authResult) {
-		if (authResult['code']) {
-			$('#signinButton').attr('style', 'display: none');
-
-
-			$.ajax({
-				type: 'POST',
-				url: '/gconnect?state={{STATE()}}',
-				processData: false,
-				data: authResult['code'],
-				contentType: 'application/octet-stream; charset=utf-8',
-				success: function(result) {
-					if (result) {
-						console.log(result);
-						$('#result').html('<h3 class="redirecting">' + result['message'] + '</h3>')
-						setTimeout(function() {
-							window.location.href = "/" + "user/" + result['user'] + "/movies/";
-						}, 4000);
-
-					} else if (authResult['error']) {
-						console.log('There was an error: ' + authResult['error']);
-					} else {
-						$('#result').html('Failed to make a server-side call. Check your configuration and console.')	
+		<!--Logo container -->
+		<div class="col-md-4">
+			<a href="{{ url_for('users') }}"><img id="logo" src = "{{ url_for('static', filename='images/logo.jpg') }}" alt="The Movie Log!"></a>
+		</div>
+		<!-- Container for redirect messages -->
+		<div class="col-md-4">
+			<div id="result"></div>
+		</div>
+		<!-- Container for login buttons -->
+		<div class="col-md-4 text-right">
+			<div class = "row">
+				<!-- Google sign in button -->
+				<div id="signInButton">
+					<span class="g-signin"
+						  data-scope="openid email"
+						  data-clientid="888856131964-dpsq7hb9pof9qsqp1i76ook5tt6mvgq8.apps.googleusercontent.com"
+						  data-redirecturi='postmessage'
+						  data-accesstype="offline"
+						  data-cookiepolicy="single_host_origin"
+						  data-callback="signInCallback"
+						  data-approvalprompt="force"
+						  data-width="25px">
+					</span>
+				</div>
+				<!-- Script for calling Google sign-in API. Placed here for use of the injected current State function -->
+				<script>
+					function signInCallback(authResult) {
+						if (authResult['code']) {
+							$('#signinButton').attr('style', 'display: none');
+							
+							$.ajax({
+								type: 'POST',
+								url: '/gconnect?state={{STATE()}}',
+								processData: false,
+								data: authResult['code'],
+								contentType: 'application/octet-stream; charset=utf-8',
+								success: function(result) {
+									if (result) {
+										console.log(result);
+										$('#result').html('<h3 class="redirecting">' + result['message'] + '</h3>')
+										setTimeout(function() {
+											window.location.href = "/" + "user/" + result['user'] + "/movies/";
+										}, 4000);
+									} else if (authResult['error']) {
+										console.log('There was an error: ' + authResult['error']);
+									} else {
+										$('#result').html('Failed to make a server-side call. Check your configuration and console.')	
+									}
+								}
+							});
+						}
 					}
-				}
-			});
-		}
-	}
-	</script>
+				</script>
 
-	<div id="fb-root"></div>
-<script>
+				<!-- Container for placeing Facebook login -->
+				<div id="fb-root"></div>
+				<!-- Script for calling Google sign-in API. Placed here for use of the injected crurent State function -->
+				<script>
+					(function(d, s, id) {
+  						var js, fjs = d.getElementsByTagName(s)[0];
+  						if (d.getElementById(id)) return;
+  						js = d.createElement(s); js.id = id;
+  						js.src = "//connect.facebook.net/en_US/sdk.js#xfbml=1&version=v2.5&appId=244941795842820";
+  						fjs.parentNode.insertBefore(js, fjs);
+					}(document, 'script', 'facebook-jssdk'));
 
-(function(d, s, id) {
-  var js, fjs = d.getElementsByTagName(s)[0];
-  if (d.getElementById(id)) return;
-  js = d.createElement(s); js.id = id;
-  js.src = "//connect.facebook.net/en_US/sdk.js#xfbml=1&version=v2.5&appId=244941795842820";
-  fjs.parentNode.insertBefore(js, fjs);
-}(document, 'script', 'facebook-jssdk'));
-
-
-		function sendTokenToServer() {
-			var access_token = FB.getAccessToken();
-			console.log(access_token)
-			console.log('Welcome! Fetching your information.... ');
-			FB.api('/me', function(response) {
-				console.log('Successful login for: ' + response.name);
-				$.ajax({
-					type: 'POST',
-					url: '/fbconnect?state={{STATE()}}',
-					processData: false,
-					data: access_token,
-					contentType: 'application/octet-stream; charset=utf-8',
-					success: function(result) {
-					if (result) {
-						console.log(result);
-						$('#result').html('<h3 class="redirecting">' + result['message'] + '</h3>')
-						setTimeout(function() {
-							window.location.href = "/" + "user/" + result['user'] + "/movies/";
-						}, 4000);
-
-					} else if (authResult['error']) {
-						console.log('There was an error: ' + authResult['error']);
-					} else {
-						$('#result').html('Failed to make a server-side call. Check your configuration and console.')	
+					function sendTokenToServer() {
+						var access_token = FB.getAccessToken();
+						console.log(access_token)
+						console.log('Welcome! Fetching your information.... ');
+						FB.api('/me', function(response) {
+							console.log('Successful login for: ' + response.name);
+				
+							$.ajax({
+								type: 'POST',
+								url: '/fbconnect?state={{STATE()}}',
+								processData: false,
+								data: access_token,
+								contentType: 'application/octet-stream; charset=utf-8',
+								success: function(result) {
+									if (result) {
+										console.log(result);
+										$('#result').html('<h3 class="redirecting">' + result['message'] + '</h3>')
+										setTimeout(function() {
+											window.location.href = "/" + "user/" + result['user'] + "/movies/";
+										}, 4000);
+									} else if (authResult['error']) {
+										console.log('There was an error: ' + authResult['error']);
+									} else {
+										$('#result').html('Failed to make a server-side call. Check your configuration and console.')	
+									}
+								}
+							});
+						});
 					}
-				}
-				});
-			});
-		}
-</script>
+				</script>
 
-<div class="fb-login-button" data-size="large" data-show-faces="false" data-auto-logout-link="false" scope="public_profile,email" onlogin="sendTokenToServer();"></div>
-<h4 style="float: right">Log In/Create Account: </h4>
-
-</div>
-
-
-
-</div>
-</div>
+				<div class="fb-login-button" data-size="large" data-show-faces="false" data-auto-logout-link="false" scope="public_profile,email" onlogin="sendTokenToServer();"></div>
+				<h4 style="float: right">Log In/Create Account: </h4>
+			</div>
+		</div>
+	</div>
 </div>
