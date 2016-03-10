@@ -1,3 +1,4 @@
+<!-- Main movie log page for each user. Contains logic to determine whether to show a single page or one of multiple pages -->
 {% extends "main.html" %}
 {% if login() == None %}
 	{% include "header.html" %}
@@ -5,127 +6,119 @@
 	{% include "header2.html" %}
 {% endif %}
 {% block content %}
-	<div class = "row">
+	
+<div class = "row">
 	<div class="col-md-6">
-	{% if isCurrentUser %}
-	<h2>Here's what you've been watching!
-	{% else %}
-	<h2>Here's what {{user.name}}'s been watching!</h2>
-	{% endif %}
-	{% if isCurrentUser %}
-	<a href="{{ url_for('addMovie', user_id = user.id) }}">(Add New Movie)</a></h2>
+		<!-- Changes the display message based on who is logged in -->
+		{% if isCurrentUser %}
+		<h2>Here's what you've been watching!
+		{% else %}
+		<h2>Here's what {{user.name}}'s been watching!</h2>
+		{% endif %}
+		<!-- Gives options to add a movie or delete account if the appropriate user is logged in -->
+		{% if isCurrentUser %}
+		<a href="{{ url_for('addMovie', user_id = user.id) }}">(Add New Movie)</a></h2>
 	</div>
-	<div class="col-md-6">
-	<h4 id="deleteAccount"><a href="{{ url_for('deleteUser', user_id = user.id) }}">(Delete Account)</a></h4>
-	{% endif %}
+		<div class="col-md-6">
+			<h4 id="deleteAccount"><a href="{{ url_for('deleteUser', user_id = user.id) }}">(Delete Account)</a></h4>
+		{% endif %}
 	</div>
 </div>
-	<div class="row flash">
+<div class="row flash">
+	<!-- Show any flash messages -->
 	{% with messages = get_flashed_messages() %}
     {% if messages %}
-
         <ul>
-        {% for message in messages %}
-          <li><strong>{{ message }} </strong> </li>
-        {% endfor %}
-      </ul>
+        	{% for message in messages %}
+        	<li><strong>{{ message }} </strong> </li>
+        	{% endfor %}
+      	</ul>
     {% endif %}
     {% endwith %}
-</div>
 </div>    
-	<div class="row">
+<div class="row">
 	<div class="col-md-1"></div>
 	<div class="col-md-10">
-	<div class="table-responsive">
-	<table class="table user-table">
-	<thead>
-	<!--<tr>
-	<th>Date Watched</th>
-	<th>Title</th>
-	<th>Description</th>
-	<th>Review</th>
-	<th>Rating</th>
-	</tr>-->
-	</thead>
-	<tbody>
-	{% for movie in movies %}
-	<tr>
-	<td id="datecell{{movie.mdbid}}" class="col-md-2"></td>
-		<script type="text/javascript">
-			var datewatched = "{{movie.datewatched}}";
-			console.log(datewatched);
-			$('#datecell{{movie.mdbid}}').append(moment(datewatched, 'YYYY-MM-DD').format('MMMM Do, YYYY') + '<br><input value={{movie.rating}} data-size="xs" class="rating-loading">');
-		</script>
-	<td id="{{movie.mdbid}}"></td>
-		<script type="text/javascript">
-			var key = '924332c90e5f89d0bc88e02232ff0723';
-			var id = {{movie.mdbid}};
-			var url = 'https://api.themoviedb.org/3/movie/' + id + '?api_key=' + key;
+		<div class="table-responsive">
+			<table class="table user-table">					
+				<tbody>
+				{% for movie in movies %}
+					<tr>
+						<td id="datecell{{movie.mdbid}}" class="col-md-2"></td>
+						<!-- Show the date watched and the star rating for the movie -->
+						<script type="text/javascript">
+							var datewatched = "{{movie.datewatched}}";
+							$('#datecell{{movie.mdbid}}').append(moment(datewatched, 'YYYY-MM-DD').format('MMMM Do, YYYY') + '<br><input value={{movie.rating}} data-size="xs" class="rating-loading">');
+						</script>
+						<td id="{{movie.mdbid}}"></td>
+						<!-- Show the poster, title, and description using an ajax call with the Movie Database API -->
+						<script type="text/javascript">
+							var key = '924332c90e5f89d0bc88e02232ff0723';
+							var id = {{movie.mdbid}};
+							var url = 'https://api.themoviedb.org/3/movie/' + id + '?api_key=' + key;
 
-			$.ajax({
-				'url': url,
-				'dataType': 'jsonp',
-				'type': 'GET',
-				'contentType': 'application/json',
-				'async': false,
-				'success': function(data, textStats, XMLHttpRequest) {
-					console.log(data);
-					$('#{{movie.mdbid}}').append('<img data-toggle="modal" data-target="#movie-modal" data-movieid="{{movie.mdbid}}" width=100 src="https://image.tmdb.org/t/p/w396/' + data.poster_path + '">');
-					$('#desc{{movie.mdbid}}').append('<h4>' + data.title + '</h4>' + data.overview);
-				},
-				'error': function() {
-					console.log('There was a problem.');
-				}
-			});
-		</script>
-	<td id="desc{{movie.mdbid}}"></td>
-	<td>{{movie.review}}</td>
-	{% if isCurrentUser %}
-	<td><a href="{{ url_for('editMovie', user_id = user.id, movie_id = movie.id) }}">(Edit)</a></td>
-	<td><a href="{{ url_for('deleteMovie', user_id = user.id, movie_id = movie.id) }}">(Delete)</a></td>
-	{% endif %}
+							$.ajax({
+								'url': url,
+								'dataType': 'jsonp',
+								'type': 'GET',
+								'contentType': 'application/json',
+								'async': false,
+								'success': function(data, textStats, XMLHttpRequest) {
+									$('#{{movie.mdbid}}').append('<img data-toggle="modal" data-target="#movie-modal" data-movieid="{{movie.mdbid}}" width=100 src="https://image.tmdb.org/t/p/w396/' + data.poster_path + '">');
+									$('#desc{{movie.mdbid}}').append('<h4>' + data.title + '</h4>' + data.overview);
+								},
+								'error': function() {
+									console.log('There was a problem.');
+								}
+							});
+						</script>
+						<td id="desc{{movie.mdbid}}"></td>
+						<td>{{movie.review}}</td>
+						<!-- Show the edit and delete buttons if it is the appropriate user -->
+						{% if isCurrentUser %}
+						<td><a href="{{ url_for('editMovie', user_id = user.id, movie_id = movie.id) }}">(Edit)</a></td>
+						<td><a href="{{ url_for('deleteMovie', user_id = user.id, movie_id = movie.id) }}">(Delete)</a></td>
+						{% endif %}
+					</tr>
+					{% endfor %}
+				</tbody>
+			</table>
+		</div>
+		<!-- Show the other page numbers if this is one of multiple pages -->
+		{% if page > 0 %}
+		<h4 id = "pagecontainer">
+			{% for x in range(noPages) %}
+			<span id = "pages">
+				{% if page != x + 1 %}
+				<a href="{{ url_for('showMoviesPages', user_id = user.id, page = x + 1) }}">
+					{% endif %}
+					{{x+1}}
+					{% if page != x + 1 %}
+				</a>
+			{% endif %}
+			</span>
+			{% endfor %}
+		</h4>
+		{% endif %}
+	</div>
+</div>
 
-	{% endfor %}
-	</tbody>
-	</table>
-	</div>
-	{% if page > 0 %}
-	<h4 id = "pagecontainer">
-	{% for x in range(noPages) %}
-	<span id = "pages">
-	{% if page != x + 1 %}
-	<a href="{{ url_for('showMoviesPages', user_id = user.id, page = x + 1) }}">
-	{% endif %}
-	{{x+1}}
-	{% if page != x + 1 %}
-	</a>
-	{% endif %}
-	</span>
-	{% endfor %}
-	</h4>
-	{% endif %}
-	</div>
-	</div>
-	<div id="movie-modal" class="modal fade" role="dialog">
-		<div class="modal-dialog">
-			<!-- Modal content-->
-			<div class="modal-content">
-				<div class="modal-header">
-					<button type="button" class="close" data-dismiss="modal">&times;</button>
-					<h4 class="modal-title"></h4>
-				</div>
-				<div class="modal-body">
-					<div id="mb"></div>
-				</div>
+<!-- Modal to display movie info for a clicked movie -->
+<div id="movie-modal" class="modal fade" role="dialog">
+	<div class="modal-dialog">
+		<!-- Modal content-->
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal">&times;</button>
+				<h4 class="modal-title"></h4>
+			</div>
+			<div class="modal-body">
+				<div id="mb"></div>
+			</div>
 				<div class="modal-footer">
 				</div>
-			</div>
 		</div>
 	</div>
-	<script>
-	$(document).on('ready', function(){
-		$('.rating-loading').rating({displayOnly: true});
-	});
-	</script>
+</div>
 
 {% endblock %}
