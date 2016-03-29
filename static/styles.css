@@ -6,7 +6,7 @@ p {color: white;}
 td {color: white;}
 label {color: white; padding-top: 5px;}
 
-#signinbutton, .fb-login-button, #login_label {float: right; padding: 5px;}
+#signinbutton, .fb-login-button, #login_label {text-align: right; float: right; padding: 5px;}
 .fb-login-button {padding-top: 8px;}
 .top-menu {background-color: #99D9EA;}
 #loginstatus {color: black;}
@@ -42,12 +42,12 @@ p.black {color: black;}
 @media screen and (max-width: 974px) {
 	#logo_container {width: 176px;}
 	#logo_container, #login_container {margin: auto; display: block; text-align: center;}
-	#signinbutton, .fb-login-button {float: none;}
+	#signinbutton, .fb-login-button {float: none; text-align: center; margin: auto;}
+
 }
 
 @media screen and (max-width: 1225px) {
 	#login_label {display: none;}
-	#signinbutton, .fb-login-button {margin: auto; display: block; text-align: center;}
 }
 
 /*body            { font-family: sans-serif; background-color: #333333; }
