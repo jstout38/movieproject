@@ -57,6 +57,15 @@ def inject_picture():
 			return None
 	return dict(picture=current_picture)
 
+@app.context_processor
+def inject_userid():
+	def current_id():
+		try:
+			return login_session['user_id']
+		except:
+			return None
+	return dict(current_user_id=current_id)
+
 
 #Root directory for the web abb, visiting it determines the current state and displays four random users and their most recently watched movies.
 #The original index page was a list of users, hence the name. The name may be changed to a more descriptive one in future versions.
