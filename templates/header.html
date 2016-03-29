@@ -3,14 +3,14 @@
 	<div class="row top-menu">
 		<!--Logo container -->
 		<div class="col-md-4">
-			<a href="{{ url_for('users') }}"><img id="logo" src = "{{ url_for('static', filename='images/logo.jpg') }}" alt="The Movie Log!"></a>
+			<a href="{{ url_for('users') }}" id="logo_container"><img id="logo" src = "{{ url_for('static', filename='images/logo.jpg') }}" alt="The Movie Log!"></a>
 		</div>
 		<!-- Container for redirect messages -->
 		<div class="col-md-4">
 			<div id="result"></div>
 		</div>
 		<!-- Container for login buttons -->
-		<div class="col-md-4 text-right">
+		<div class="col-md-4" id = "login_container">
 			<div class = "row">
 				<!-- Google sign in button -->
 				<div id="signInButton">
@@ -99,7 +99,7 @@
 				</script>
 
 				<div class="fb-login-button" data-size="large" data-show-faces="false" data-auto-logout-link="false" scope="public_profile,email" onlogin="sendTokenToServer();"></div>
-				<h4 style="float: right">Log In/Create Account: </h4>
+				<h4 id="login_label">Log In/Create Account: </h4>
 			</div>
 		</div>
 	</div>
